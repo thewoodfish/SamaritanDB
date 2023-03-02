@@ -1,142 +1,85 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
 #[ink::contract]
-mod sam_os {
+mod sam_contract {
+    use ink::{prelude::vec::Vec, storage::Mapping};
+    use ink_prelude::string::String;
 
-    /// Defines the storage of your contract.
-    /// Add new fields to the below struct in order
-    /// to add new static storage fields to your contract.
+    type DID = String;
+    type IpfsCid = String;
+    type HashKey = String;
+    type AuthContent = String;
+    type DatabaseMetadata = String;
+
+    #[derive(scale::Decode, scale::Encode)]
+    #[cfg_attr(
+        feature = "std",
+        derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
+    )]
+    struct FileMeta {
+        access_list: Vec<AccountId>,
+        cid: IpfsCid,
+        timestamp: u64,
+        db_meta: DatabaseMetadata,
+    }
+
+    #[derive(scale::Decode, scale::Encode)]
+    #[cfg_attr(
+        feature = "std",
+        derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
+    )]
+    struct UserInfo {
+        auth_content: AuthContent,
+        did_doc_cid: IpfsCid,
+    }
+
     #[ink(storage)]
+    #[derive(Default)]
     pub struct SamOs {
-        /// Stores a single `bool` value on the storage.
-        value: bool,
+        /// Storage for DIDs and their documents and auth material
+        auth_list: Mapping<DID, UserInfo>,
+        /// Storage for user documents metadata
+        files_meta: Mapping<HashKey, FileMeta>,
+        /// Stores the access list of a file for easy retreival
+        access_list: Mapping<DID, (HashKey, u64)>,
     }
 
     impl SamOs {
-        /// Constructor that initializes the `bool` value to the given `init_value`.
+        /// Constructor that initializes all the contract storage to default
         #[ink(constructor)]
-        pub fn new(init_value: bool) -> Self {
-            Self { value: init_value }
+        pub fn new() -> Self {
+            Self::default()
         }
 
-        /// Constructor that initializes the `bool` value to `false`.
-        ///
-        /// Constructors can delegate to other constructors.
-        #[ink(constructor)]
-        pub fn default() -> Self {
-            Self::new(Default::default())
-        }
-
-        /// A message that can be called on instantiated contracts.
-        /// This one flips the value of the stored `bool` from `true`
-        /// to `false` and vice versa.
         #[ink(message)]
-        pub fn flip(&mut self) {
-            self.value = !self.value;
-        }
+        pub fn create_new_account(
+            &mut self,
+            did: DID,
+            auth_content: AuthContent,
+            did_doc_cid: IpfsCid,
+        ) -> Result<(), String>{
+            let user = UserInfo {
+                auth_content,
+                did_doc_cid,
+            };
+            self.auth_list.insert(did, &user);
 
-        /// Simply returns the current value of our `bool`.
-        #[ink(message)]
-        pub fn get(&self) -> bool {
-            self.value
+            Ok(())
         }
     }
 
-    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
-    /// module and test functions are marked with a `#[test]` attribute.
-    /// The below code is technically just normal Rust code.
     #[cfg(test)]
     mod tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
         use super::*;
 
-        /// We test if the default constructor does its job.
-        #[ink::test]
-        fn default_works() {
-            let sam_os = SamOs::default();
-            assert_eq!(sam_os.get(), false);
-        }
-
-        /// We test a simple use case of our contract.
         #[ink::test]
         fn it_works() {
-            let mut sam_os = SamOs::new(false);
-            assert_eq!(sam_os.get(), false);
-            sam_os.flip();
-            assert_eq!(sam_os.get(), true);
-        }
-    }
-
-
-    /// This is how you'd write end-to-end (E2E) or integration tests for ink! contracts.
-    ///
-    /// When running these you need to make sure that you:
-    /// - Compile the tests with the `e2e-tests` feature flag enabled (`--features e2e-tests`)
-    /// - Are running a Substrate node which contains `pallet-contracts` in the background
-    #[cfg(all(test, feature = "e2e-tests"))]
-    mod e2e_tests {
-        /// Imports all the definitions from the outer scope so we can use them here.
-        use super::*;
-
-        /// A helper function used for calling contract messages.
-        use ink_e2e::build_message;
-
-        /// The End-to-End test `Result` type.
-        type E2EResult<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-
-        /// We test that we can upload and instantiate the contract using its default constructor.
-        #[ink_e2e::test]
-        async fn default_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
-            // Given
-            let constructor = SamOsRef::default();
-
-            // When
-            let contract_account_id = client
-                .instantiate("sam_os", &ink_e2e::alice(), constructor, 0, None)
-                .await
-                .expect("instantiate failed")
-                .account_id;
-
-            // Then
-            let get = build_message::<SamOsRef>(contract_account_id.clone())
-                .call(|sam_os| sam_os.get());
-            let get_result = client.call_dry_run(&ink_e2e::alice(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), false));
-
-            Ok(())
-        }
-
-        /// We test that we can read and write a value from the on-chain contract contract.
-        #[ink_e2e::test]
-        async fn it_works(mut client: ink_e2e::Client<C, E>) -> E2EResult<()> {
-            // Given
-            let constructor = SamOsRef::new(false);
-            let contract_account_id = client
-                .instantiate("sam_os", &ink_e2e::bob(), constructor, 0, None)
-                .await
-                .expect("instantiate failed")
-                .account_id;
-
-            let get = build_message::<SamOsRef>(contract_account_id.clone())
-                .call(|sam_os| sam_os.get());
-            let get_result = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), false));
-
-            // When
-            let flip = build_message::<SamOsRef>(contract_account_id.clone())
-                .call(|sam_os| sam_os.flip());
-            let _flip_result = client
-                .call(&ink_e2e::bob(), flip, 0, None)
-                .await
-                .expect("flip failed");
-
-            // Then
-            let get = build_message::<SamOsRef>(contract_account_id.clone())
-                .call(|sam_os| sam_os.get());
-            let get_result = client.call_dry_run(&ink_e2e::bob(), &get, 0, None).await;
-            assert!(matches!(get_result.return_value(), true));
-
-            Ok(())
+            let mut sam = SamOs::new();
+            assert_eq!(sam.create_new_account(
+                "did:sam:root:DSOSAI0M83YAULZZLR6DEJMD3IWDKDHCRMJAR4HTFBHCW".to_string(),
+                "DSOSAI0M83YAULZZLR6DEJMD3IWDKDHCRMJA".to_string(),
+                "uhskjkfuai90arf0j9afsda".to_string(),
+            ), Ok(()));
         }
     }
 }

@@ -9,9 +9,7 @@ edition = "2021"
 tokio = { version = "1.0.0", features = ["full", "tracing"] }
 tokio-util = { version = "0.7.0", features = ["full"] }
 tokio-stream = { version = "0.1" }
-
-# contract crate
-sam_os = { path = "../sam_os" }
+blake2 = "0.10.6"
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3.1", default-features = false, features = ["fmt", "ansi", "env-filter", "tracing-log"] }

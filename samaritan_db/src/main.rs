@@ -8,9 +8,7 @@ use futures::SinkExt;
 use std::collections::HashMap;
 use std::env;
 use std::error::Error;
-use std::process::Command;
 use std::sync::{Arc, Mutex};
-use sam_os;
 
 /// The in-memory database shared amongst all clients.
 ///
@@ -20,23 +18,29 @@ struct Database {
     map: Mutex<HashMap<String, String>>,
 }
 
+/// The struct that describes behaviour of the database
+// struct Config {
+//     contract_addr: String
+// }
+
 /// Possible requests our clients can send us
 enum Request<'a> {
-    New { class: &'a str },
+    New { class: &'a str, password: &'a str },
     Get { key: String },
     Set { key: String, value: String },
 }
 
 /// Responses to the `Request` commands above
 enum Response {
-    Value {
-        key: String,
-        value: String,
+    Single(String),
+    Double {
+        one: String,
+        two: String,
     },
-    Set {
-        key: String,
-        value: String,
-        previous: Option<String>,
+    Triple {
+        one: String,
+        two: String,
+        three: Option<String>,
     },
     Error {
         msg: String,
@@ -118,21 +122,24 @@ fn handle_request(line: &str, db: &Arc<Database>) -> Response {
 
     let mut db = db.map.lock().unwrap();
     match request {
-        Request::New { class } => {
-            // let detail = if class == "sam" {
-            //     chain::new_samaritan();
-            // } else {
-            //     chain::new_application();
-            // }
-            let mut list_dir = Command::new("ls");
-            println!("{:?}", list_dir);
-
-            Response::Value { key: "ds".to_owned(), value: "ds".to_owned() }
+        Request::New { class, password } => {
+            let did = util::get_did(class);
+            // create the new user on chain
+            if contract::create_new_account(&did, password) {
+                Response::Double {
+                    one: did.to_owned(),
+                    two: password.to_owned(),
+                }
+            } else {
+                Response::Error {
+                    msg: "could not complete creation of account".into(),
+                }
+            }
         }
         Request::Get { key } => match db.get(&key) {
-            Some(value) => Response::Value {
-                key,
-                value: value.clone(),
+            Some(value) => Response::Double {
+                one: key,
+                two: value.clone(),
             },
             None => Response::Error {
                 msg: format!("no key {}", key),
@@ -140,10 +147,10 @@ fn handle_request(line: &str, db: &Arc<Database>) -> Response {
         },
         Request::Set { key, value } => {
             let previous = db.insert(key.clone(), value.clone());
-            Response::Set {
-                key,
-                value,
-                previous,
+            Response::Triple {
+                one: key,
+                two: value,
+                three: previous,
             }
         }
     }
@@ -178,15 +185,21 @@ impl<'a> Request<'a> {
             }
             Some("NEW") => {
                 let class = parts.next().ok_or("NEW must be followed by a type")?;
-                if parts.next().is_some() {
-                    return Err("only the type of user must be specified after NEW".into());
-                }
                 if class != "sam" && class != "app" {
                     return Err("invalid type of user specified".into());
                 }
-                Ok(Request::New {
-                    class,
-                })
+                let password = parts
+                    .next()
+                    .ok_or("After specifying the type, you must specify a password")?;
+
+                // check password length and content
+                if password.chars().all(char::is_alphabetic)
+                    || password.chars().all(char::is_numeric)
+                    || password.len() < 8
+                {
+                    return Err("password must be aplhanumeric and more than 8 characters".into());
+                }
+                Ok(Request::New { class, password })
             }
             Some(cmd) => Err(format!("unknown command: {}", cmd)),
             None => Err("empty input".into()),
@@ -197,22 +210,98 @@ impl<'a> Request<'a> {
 impl Response {
     fn serialize(&self) -> String {
         match *self {
-            Response::Value { ref key, ref value } => format!("{} = {}", key, value),
-            Response::Set {
-                ref key,
-                ref value,
-                ref previous,
-            } => format!("set {} = `{}`, previous: {:?}", key, value, previous),
+            Response::Single(ref one) => format!("{}", one),
+            Response::Double { ref one, ref two } => format!("[{}, {}]", one, two),
+            Response::Triple {
+                ref one,
+                ref two,
+                ref three,
+            } => format!(
+                "[{}, {}, {}]",
+                one,
+                two,
+                three.to_owned().unwrap_or_default()
+            ),
             Response::Error { ref msg } => format!("error: {}", msg),
         }
     }
 }
 
-mod chain {
-    pub fn new_samaritan() {
+mod contract {
+    use super::util;
+    use std::process::Command;
+
+    pub fn create_new_account(did: &str, password: &str) -> bool {
+        let password = util::blake2_hash(password);
+        let binding = String::from_utf8(password).unwrap_or_default();
+        let pw_str = binding.as_str();
+
+        let output = Command::new("cargo")
+            .args([
+                "contract",
+                "call",
+                "--contract",
+                "5ErTHUWGoxPps2CSZmTEhtpErM7SkKnf5mzeG5cb3UDCe4zQ",
+                "--message",
+                "create_new_account",
+                "--suri",
+                "//Alice",
+                "--args",
+                did,
+                pw_str,
+                "emptyDidDocument", /* DID Document is not handled yet */
+            ]) 
+            .current_dir("../sam_os")
+            .output()
+            .expect("failed to execute process");
+
+        println!("{:?}", output);
+        true
     }
 }
 
 mod util {
+    use blake2::{/* Blake2b512, */ Blake2s256, Digest};
+    use rand::{distributions::Alphanumeric, thread_rng, Rng};
 
+    /// generate a did for the user
+    pub fn get_did(class: &str) -> String {
+        let mut _did = String::with_capacity(60);
+        let random_str = gen_random_str(43);
+        if class == "sam" {
+            _did = format!("did:sam:root:DS{random_str}");
+        } else {
+            _did = format!("did:sam:apps:DS{random_str}");
+        }
+        _did
+    }
+
+    /// generate random number of alphanumerics
+    pub fn gen_random_str(n: u32) -> String {
+        let r = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(n as usize)
+            .map(|mut e| {
+                let a = 32;
+                if e.is_ascii_alphabetic() {
+                    e = e & !a;
+                }
+                e
+            })
+            .collect::<Vec<_>>();
+        String::from_utf8_lossy(&r).into()
+    }
+
+    /// generate a blake2 hash of input
+    pub fn blake2_hash(input: &str) -> Vec<u8> {
+        // create a Blake2b512 object
+        let mut hasher = Blake2s256::new();
+
+        // write input message
+        hasher.update(input);
+
+        // read hash digest and consume hasher
+        let res = hasher.finalize();
+        res[..].to_owned()
+    }
 }

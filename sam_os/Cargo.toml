@@ -10,8 +10,7 @@ ink = { version = "4.0.0", default-features = false }
 scale = { package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }
 scale-info = { version = "2.3", default-features = false, features = ["derive"], optional = true }
 
-[dev-dependencies]
-ink_e2e = "4.0.0"
+ink_prelude = { version = "4.0.1", default-features = false }
 
 [lib]
 path = "lib.rs"
@@ -20,6 +19,7 @@ path = "lib.rs"
 default = ["std"]
 std = [
     "ink/std",
+    "ink_prelude/std",
     "scale/std",
     "scale-info/std",
 ]
