@@ -26,6 +26,8 @@ pub struct Database {
 pub struct Config {
     /// contract storage
     pub contract_storage: Mutex<SamOs>,
+    /// IPFS synchronization interval
+    pub ipfs_sync_interval: u64
 }
 
 /// Possible requests our clients can send us
@@ -70,18 +72,18 @@ impl Database {
 
     /// checks if an account has been intitialized already
     pub fn account_is_auth(&self, did: &str) -> bool {
-        let mut guard = self.auth_list.lock().unwrap();
+        let guard = self.auth_list.lock().unwrap();
         guard.contains(&util::gen_hash(did))
     }
 
     /// adds an account to the auth list
-    pub fn add_auth_account(&mut self, did: &str) {
+    pub fn add_auth_account(&self, did: &str) {
         let mut guard = self.auth_list.lock().unwrap();
-        guard.push(util::gen_hash(did))
+        guard.push(util::gen_hash(did));
     }
 
     /// insert custom DID data into the database
-    pub fn insert(&mut self, subject_key: HashKey, object_key: HashKey, hashkey: HashKey, key: HashKey, value: String) -> String {
+    pub fn insert(&self, subject_key: HashKey, object_key: HashKey, hashkey: HashKey, key: HashKey, value: String) -> String {
         let mut guard = self.did_file_table.lock().unwrap();
         // update the did file table entry
         guard.entry(subject_key).or_insert(hashkey);
@@ -91,15 +93,19 @@ impl Database {
         }
 
         // previous data
-        let mut previous_data: Option<String>;
+        let previous_data: Option<String>;
 
         // update the file lookup table
         let mut guard = self.file_lookup_table.lock().unwrap();
-        if let Some(mut kv_entry) = guard.get(&hashkey) {
-            previous_data = (*kv_entry).insert(key, value);
+        if let Some(kv_entry) = guard.get(&hashkey) {
+            let mut entry = kv_entry.clone();
+            previous_data = (entry).insert(key, value);
+
+            // commit to storage
+            guard.insert(hashkey, entry);
         } else {
             // create new and insert entry
-            let kv_pair: HashMap<HashKey, String> = HashMap::new();
+            let mut kv_pair: HashMap<HashKey, String> = HashMap::new();
             previous_data = kv_pair.insert(key, value);
 
             // save data
@@ -109,21 +115,77 @@ impl Database {
     }
 
     /// retreive a database entry
-    pub fn get(&mut self, hashkey: HashKey, key: HashKey) -> Option<String> {
-        let mut guard = self.did_file_table.lock().unwrap();
+    pub fn get(&self, hashkey: HashKey, data_key: HashKey, subject_key: &str, object_key: &str) -> Option<String> {
+        // we have to process the hashkey to check access permissions
+        let key_str = format!("{}", hashkey);
 
+        // if its an app
+        let file_key = if is_did(subject_key, "app") {
+            if object_key == "" {
+                // if the app owns the data
+                let solo_app_key_str = format_hk(&key_str, 0, 0);
+                let solo_app_key = u64::from_str_radix(&solo_app_key_str, 10).unwrap_or_default();
+                
+                // get file key
+                solo_app_key
+                
+            } else {
+                // check that the app has access to a Samaritans data
+                let combined_key_str = format_hk(&key_str, 1, 0);
+                let combined_key = u64::from_str_radix(&combined_key_str, 10).unwrap_or_default();
+                
+                // get file key
+                combined_key
+            }
+        } else {
+            // get solo data of a Samaritan
+            let solo_sam_key_str = format_hk(&key_str, 1, 0);
+            let solo_sam_key = u64::from_str_radix(&solo_sam_key_str, 10).unwrap_or_default();
+    
+            // get file key
+            solo_sam_key
+        };
+        
+        // now try to read the entry if it exists 
+        // get the data
+        let guard = self.file_lookup_table.lock().unwrap();
+        if let Some(kv_store) = guard.get(&file_key) {
+            if let Some(val) = (*kv_store).get(&data_key) {
+                Some(val.clone())
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
+
+
+    /// get a snapshot of the database
+    pub fn snapshot(&self) {
+        let guard = self.auth_list.lock().unwrap();
+        println!("auth_list -> {:#?}", guard);
+
+        let guard = self.did_file_table.lock().unwrap();
+        println!("did_file_table -> {:#?}", guard);
+
+        let guard = self.file_lookup_table.lock().unwrap();
+        println!("file_lookup_table -> {:#?}", guard);
     }
 }
 
 impl Config {
     pub fn new() -> Self {
-        Default::default()
+        Self {
+            contract_storage: Default::default(),
+            ipfs_sync_interval: 30  // sync every 30 seconds
+        }
     }
 }
 
 impl<'a> Request<'a> {
     pub fn parse(input: &'a str) -> Result<Request<'a>, String> {
-        let mut parts = input.splitn(3, "~~");
+        let mut parts = input.split("~~");
         match parts.next() {
             Some("GET") => {
                 let subject_did = match parts.next() {
@@ -134,6 +196,7 @@ impl<'a> Request<'a> {
                         },
                     _ => return Err("INSERT must be followed by a SamOs DID".into()),
                 };
+
                 // retreive the key
                 let key = match parts.next() {
                     Some(key) => key,

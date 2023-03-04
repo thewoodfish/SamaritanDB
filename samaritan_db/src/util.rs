@@ -70,9 +70,9 @@ pub fn format_hk<'a>(hk: &'a str, bin_one: u32, bin_two: u32) -> String {
     format!("{}{}{}", &hk[0..length], bin_one, bin_two)
 }
 
-// calculate the hashkey
+/// calculates the hashkey based on its imput
 pub fn get_hashkey(subject_did: &str, object_did: &str) -> HashKey {
-    let mut hash_key: HashKey;
+    let hash_key: HashKey;
     if object_did == "" {
         let hk = gen_hash(subject_did);
         let hashkey_buf = format_hk(&format!("{hk}"), 0, 0);
@@ -80,7 +80,7 @@ pub fn get_hashkey(subject_did: &str, object_did: &str) -> HashKey {
     } else {
         // combine the object and subject to form the hashkey
         let hk = gen_hash(&format!("{}{}", subject_did, object_did));
-        let hashkey_buf = format_hk(&format!("{hk}"), 0, 1); // app has access but did owns the data
+        let hashkey_buf = format_hk(&format!("{hk}"), 1, 0); // app has access but did owns the data
         hash_key = u64::from_str_radix(&hashkey_buf, 10).unwrap_or_default();
     }
 

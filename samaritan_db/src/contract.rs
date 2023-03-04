@@ -72,11 +72,15 @@ pub mod interface {
         true
     }
 
-    pub fn account_is_auth(did: &str, config: &Arc<Config>) -> bool {
-        let mut guard = config.contract_storage.lock().unwrap();
+    pub fn account_is_auth(did: &str, config: &Arc<Config>, passw: &str) -> bool {
+        let guard = config.contract_storage.lock().unwrap();
+        let password = util::gen_hash(passw);
 
-        if let Some(_) = guard.auth_list.get(did) {
-            return true;
+        if let Some(user_info) = guard.auth_list.get(did) {
+            if password == (*user_info).auth_content {
+                return true;
+            }
+            return false;
         } else {
             return false;
         }

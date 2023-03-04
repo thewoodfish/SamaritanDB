@@ -12,7 +12,8 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::{Framed, LinesCodec};
 
 use futures::SinkExt;
-use std::env;
+use std::time::Duration;
+use std::{env, thread};
 use std::error::Error;
 // use std::fmt::format;
 use std::sync::Arc;
@@ -35,8 +36,20 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // clients. Note the usage of `Arc` here which will be used to ensure that
     // each independently spawned client will have a reference to the in-memory
     // database and config.
-    let db = Arc::new(Database::new());
-    let config = Arc::new(Config::new());
+    let rdb = Arc::new(Database::new());
+    let rconfig = Arc::new(Config::new());
+
+    // clone the config
+    let config = rconfig.clone();
+
+    // spawn a new client that synchronizes with IPFS
+    tokio::spawn(async move {
+        loop {
+            // sleep for some seconds
+            thread::sleep(Duration::from_secs(config.ipfs_sync_interval));
+        }
+    });
+
 
     loop {
         match listener.accept().await {
@@ -44,8 +57,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
                 // After getting a new connection first we see a clone of the database & config
                 // being created, which is creating a new reference for this connected
                 // client to use.
-                let db = db.clone();
-                let config = config.clone();
+                let db = rdb.clone();
+                let config = rconfig.clone();
 
                 // Like with other small servers, we'll `spawn` this client to ensure it
                 // runs concurrently with all other clients. The `move` keyword is used
@@ -64,6 +77,9 @@ async fn main() -> Result<(), Box<dyn Error>> {
                             Ok(line) => {
                                 let response = handle_request(&line, &db, &config);
                                 let response = response.serialize();
+
+                                // log state of database
+                                db.snapshot();
 
                                 if let Err(e) = lines.send(response.as_str()).await {
                                     println!("error on sending response; error = {:?}", e);
@@ -93,6 +109,8 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             let did = get_did(class);
             // create the new user on chain
             if interface::create_new_account(&did, password, config) {
+                // add to database auth_list for high speed auth
+                db.add_auth_account(&did);
                 Response::Double {
                     one: did.to_owned(),
                     two: password.to_owned(),
@@ -107,7 +125,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             // check the database cache for an entry
             if !db.account_is_auth(&did) {
                 // check the smart contract for account entry
-                if !interface::account_is_auth(&did, config) {
+                if !interface::account_is_auth(&did, config, password) {
                     return Response::Error {
                         msg: format!("account with did:'{}' not recognized", did),
                     };
@@ -124,16 +142,32 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             key,
             object_did,
         } => {
+            // check for auth
+            if !db.account_is_auth(&subject_did) {
+                return Response::Error {
+                    msg: format!("account with did:'{}' not recognized", subject_did),
+                };
+            }
+
+            if object_did != "" {
+                if !db.account_is_auth(&object_did) {
+                    return Response::Error {
+                        msg: format!("account with did:'{}' not recognized", object_did),
+                    };
+                }
+            }
+
             // calculate hashkey
-            let mut hash_key: HashKey = get_hashkey(subject_did, object_did);
+            let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
-            match db.get(hash_key, nkey) {
+
+            match db.get(hash_key, nkey, subject_did, object_did) {
                 Some(value) => Response::Double {
-                    one: key,
+                    one: key.to_owned(),
                     two: value.to_owned(),
                 },
                 None => Response::Error {
-                    msg: format!("no key {}", key),
+                    msg: format!("no key: '{}'", key),
                 },
             }
         }
@@ -143,7 +177,22 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             value,
             object_did,
         } => {
-            let mut hash_key: HashKey = get_hashkey(subject_did, object_did);
+            // check for auth
+            if !db.account_is_auth(&subject_did) {
+                return Response::Error {
+                    msg: format!("account with did:'{}' not recognized", subject_did),
+                };
+            }
+
+            if object_did != "" {
+                if !db.account_is_auth(&object_did) {
+                    return Response::Error {
+                        msg: format!("account with did:'{}' not recognized", object_did),
+                    };
+                }
+            }
+
+            let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
             let subject_key = gen_hash(subject_did);
             let object_key = if object_did != "" {
