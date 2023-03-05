@@ -4,7 +4,6 @@ mod sam_prelude;
 mod util;
 use contract::interface;
 use sam_prelude::*;
-
 // use serde::Serialize;
 // use serde_json::{Value, json};
 use tokio::net::TcpListener;
@@ -12,14 +11,15 @@ use tokio_stream::StreamExt;
 use tokio_util::codec::{Framed, LinesCodec};
 
 use futures::SinkExt;
+use std::error::Error;
 use std::time::Duration;
 use std::{env, thread};
-use std::error::Error;
 // use std::fmt::format;
 use std::sync::Arc;
 use util::*;
 
 mod contract;
+mod ipfs;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -27,7 +27,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     // and set up our TCP listener to accept connections.
     let addr = env::args()
         .nth(1)
-        .unwrap_or_else(|| "127.0.0.1:8080".to_string());
+        .unwrap_or_else(|| "127.0.0.1:8888".to_string());
 
     let listener = TcpListener::bind(&addr).await?;
     println!("Listening on: {}", addr);
@@ -39,17 +39,34 @@ async fn main() -> Result<(), Box<dyn Error>> {
     let rdb = Arc::new(Database::new());
     let rconfig = Arc::new(Config::new());
 
-    // clone the config
+    // clone the database and config
+    let db = rdb.clone();
     let config = rconfig.clone();
 
-    // spawn a new client that synchronizes with IPFS
+    // initialize IPFS
+    // if !ipfs::init_ipfs() {
+    //     // shut down the database
+    //     println!("error: could not start IPFS daemon.");
+    //     return Ok(())
+    // }
+
+    // This is what controls whether the database is in full mode
+    // We're going to use conditional compilation here
+
+    // Spawn a new client that synchronizes with IPFS.
     tokio::spawn(async move {
+        let mut count = 1;
         loop {
             // sleep for some seconds
             thread::sleep(Duration::from_secs(config.ipfs_sync_interval));
+
+            println!("{} cycle", count);
+            count += 1;
+
+            // sync
+            db.sync_files(&config);
         }
     });
-
 
     loop {
         match listener.accept().await {
@@ -110,7 +127,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             // create the new user on chain
             if interface::create_new_account(&did, password, config) {
                 // add to database auth_list for high speed auth
-                db.add_auth_account(&did);
+                db.add_auth_account(&did, password);
                 Response::Double {
                     one: did.to_owned(),
                     two: password.to_owned(),
@@ -123,18 +140,20 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
         }
         Request::Init { did, password } => {
             // check the database cache for an entry
-            if !db.account_is_auth(&did) {
+            if !db.account_is_alive(&did, password) {
                 // check the smart contract for account entry
                 if !interface::account_is_auth(&did, config, password) {
                     return Response::Error {
-                        msg: format!("account with did:'{}' not recognized", did),
+                        msg: format!(
+                            "account with did:'{}' and password:'{} not recognized",
+                            did, password
+                        ),
                     };
                 } else {
                     // add to database auth_list for high speed auth
-                    db.add_auth_account(&did);
+                    db.add_auth_account(&did, password);
                 }
             }
-
             Response::Single(did.to_owned())
         }
         Request::Get {
@@ -161,7 +180,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
 
-            match db.get(hash_key, nkey, subject_did, object_did) {
+            match db.get(hash_key, nkey, subject_did) {
                 Some(value) => Response::Double {
                     one: key.to_owned(),
                     two: value.to_owned(),
@@ -200,7 +219,11 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             } else {
                 0
             };
+
             let previous = db.insert(subject_key, object_key, hash_key, nkey, value.clone());
+
+            // write file metadata
+            db.write_metadata(hash_key, subject_did, object_did);
 
             Response::Triple {
                 one: key.to_string(),

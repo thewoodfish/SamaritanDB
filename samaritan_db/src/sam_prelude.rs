@@ -1,11 +1,19 @@
+use std::sync::Arc;
+use std::time::{SystemTime, UNIX_EPOCH};
 use std::{sync::Mutex, collections::HashMap};
-use crate::{contract::SamOs, util};
-use crate::util::*;
 
-// type of our database key
+use crate::contract::interface;
+use crate::{contract::SamOs, util};
+use crate::{
+    util::*,
+    ipfs::{self}
+};
+
+// custom defined types
 pub type HashKey = u64;
 pub type DIDKey = u64;
 pub type FileKey = u64;
+pub type MetaMap = HashMap<HashKey, Metadata>;
 
 /// The in-memory database shared amongst all clients.
 ///
@@ -13,8 +21,10 @@ pub type FileKey = u64;
 /// going to use a `Mutex` for interior mutability.
 #[derive(Default)]
 pub struct Database {
+    /// file metadata storage
+    metacache: Mutex<MetaMap>,
     /// list of authenticated DIDs
-    auth_list: Mutex<Vec<DIDKey>>,
+    auth_list: Mutex<HashMap<HashKey, HashKey>>,
     /// table that maps did to the files they own
     did_file_table: Mutex<HashMap<DIDKey, FileKey>>,
     /// table matching files and its contents
@@ -22,12 +32,25 @@ pub struct Database {
 }
 
 /// The struct that describes behaviour of the database
-#[derive(Default)]
+#[derive(Default)]       
 pub struct Config {
     /// contract storage
     pub contract_storage: Mutex<SamOs>,
     /// IPFS synchronization interval
-    pub ipfs_sync_interval: u64
+    pub ipfs_sync_interval: u64,
+    /// Database Metadata
+    pub metadata: String
+}
+
+/// The struct containing important file information
+#[derive(Default, Debug)]       
+pub struct Metadata {
+    /// DIDs that have access to the file
+    dids: [String; 2],
+    /// access flags
+    access_bits: [bool; 2],
+    /// modified timestamp
+    modified: u64,
 }
 
 /// Possible requests our clients can send us
@@ -70,16 +93,36 @@ impl Database {
         Default::default()
     }
 
+    /// checks if an account exists
+    pub fn account_is_alive(&self, did: &str, password: &str) -> bool {
+        let guard = self.auth_list.lock().unwrap();
+        match guard.get(&util::gen_hash(did)) {
+            Some(pass) => {
+                if util::gen_hash(password) == *pass {
+                    true
+                } else {
+                    false
+                }
+            },
+            None => false
+        }
+    }
+
     /// checks if an account has been intitialized already
     pub fn account_is_auth(&self, did: &str) -> bool {
         let guard = self.auth_list.lock().unwrap();
-        guard.contains(&util::gen_hash(did))
+        match guard.get(&util::gen_hash(did)) {
+            Some(_) => {
+                true
+            },
+            None => false
+        }
     }
 
     /// adds an account to the auth list
-    pub fn add_auth_account(&self, did: &str) {
+    pub fn add_auth_account(&self, did: &str, password: &str) {
         let mut guard = self.auth_list.lock().unwrap();
-        guard.push(util::gen_hash(did));
+        guard.insert(util::gen_hash(did), util::gen_hash(password));
     }
 
     /// insert custom DID data into the database
@@ -115,37 +158,24 @@ impl Database {
     }
 
     /// retreive a database entry
-    pub fn get(&self, hashkey: HashKey, data_key: HashKey, subject_key: &str, object_key: &str) -> Option<String> {
-        // we have to process the hashkey to check access permissions
-        let key_str = format!("{}", hashkey);
-
-        // if its an app
-        let file_key = if is_did(subject_key, "app") {
-            if object_key == "" {
-                // if the app owns the data
-                let solo_app_key_str = format_hk(&key_str, 0, 0);
-                let solo_app_key = u64::from_str_radix(&solo_app_key_str, 10).unwrap_or_default();
-                
-                // get file key
-                solo_app_key
-                
+    pub fn get(&self, file_key: HashKey, data_key: HashKey, subject_did: &str) -> Option<String> {
+        // check for access permissions from the metadata
+        let mut index = 0;
+        let guard = self.metacache.lock().unwrap();
+        if let Some(meta) = guard.get(&file_key) {
+            if &meta.dids[index] == subject_did {}
+            else if &meta.dids[index] == subject_did {
+                index += 1;
             } else {
-                // check that the app has access to a Samaritans data
-                let combined_key_str = format_hk(&key_str, 1, 0);
-                let combined_key = u64::from_str_radix(&combined_key_str, 10).unwrap_or_default();
-                
-                // get file key
-                combined_key
+                return None;
             }
-        } else {
-            // get solo data of a Samaritan
-            let solo_sam_key_str = format_hk(&key_str, 1, 0);
-            let solo_sam_key = u64::from_str_radix(&solo_sam_key_str, 10).unwrap_or_default();
-    
-            // get file key
-            solo_sam_key
-        };
-        
+
+            // then use that index to check the access permissions
+            if !meta.access_bits[index] {
+                return None;
+            }
+        }
+
         // now try to read the entry if it exists 
         // get the data
         let guard = self.file_lookup_table.lock().unwrap();
@@ -160,9 +190,12 @@ impl Database {
         }
     }
 
-
     /// get a snapshot of the database
     pub fn snapshot(&self) {
+        println!("-----------------------------");
+        let guard = self.metacache.lock().unwrap();
+        println!("metacache -> {:#?}", guard);
+        
         let guard = self.auth_list.lock().unwrap();
         println!("auth_list -> {:#?}", guard);
 
@@ -171,6 +204,57 @@ impl Database {
 
         let guard = self.file_lookup_table.lock().unwrap();
         println!("file_lookup_table -> {:#?}", guard);
+        println!("-----------------------------");
+    }
+
+    /// write to important file details to metadata
+    pub fn write_metadata(&self, file_hk: HashKey, subject_did: &str, object_did: &str) {
+        let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_secs();
+        // set up metadata
+        let meta = Metadata {
+            dids: [subject_did.to_owned(), object_did.to_owned()],
+            access_bits: [true, true],
+            modified: now
+        };
+
+        // save file metadata
+        let mut guard = self.metacache.lock().unwrap();
+        guard.insert(file_hk, meta);
+    }
+
+    // This will be dealing majorly with the matadata cache of the files.
+    // The smart contract would also be queried.
+    pub fn sync_files(&self, cfg: &Arc<Config>) {
+        let mut metadata = self.metacache.lock().unwrap();
+        let ret = metadata.iter_mut()
+        .map(|m| {
+            // first check the smart contract for the latest version of the file
+            let file_info = interface::get_file_info(cfg, *m.0);
+            let ipfs_cid = file_info.1;
+            let default = HashMap::<u64, String>::new();
+
+            // get data we want to sync
+            let guard = self.file_lookup_table.lock().unwrap();
+            let data = guard.get(m.0).unwrap_or(&default);
+            let fresh_data: Box<HashMap::<u64, String>>;
+
+            println!("yes sir");
+
+            // check timestamp
+            if file_info.0 != 0 {
+                // check if we have an outdated copy
+                if file_info.0 > m.1.modified {
+                    // sync data
+                    fresh_data = ipfs::sync_data(&cfg, data, false, &ipfs_cid, *m.0, &m.1.dids, &m.1.access_bits);
+                } else {
+                    // do nothing, we're up to date
+                }
+            } else {
+                // push the first copy to IPFS
+                ipfs::sync_data(&cfg, data, true, "", *m.0, &m.1.dids, &m.1.access_bits);
+            }
+            String::new()
+        }).collect::<Vec<String>>();
     }
 }
 
@@ -178,7 +262,8 @@ impl Config {
     pub fn new() -> Self {
         Self {
             contract_storage: Default::default(),
-            ipfs_sync_interval: 30  // sync every 30 seconds
+            ipfs_sync_interval: 30,  // sync every 30 seconds
+            metadata: String::new()     // will populate this later
         }
     }
 }
@@ -299,7 +384,7 @@ impl<'a> Request<'a> {
 impl Response {
     pub fn serialize(&self) -> String {
         match *self {
-            Response::Single(ref one) => format!("ok, {}", one),
+            Response::Single(ref one) => format!("[ok, {}]", one),
             Response::Double { ref one, ref two } => format!("[ok, {}, {}]", one, two),
             Response::Triple {
                 ref one,

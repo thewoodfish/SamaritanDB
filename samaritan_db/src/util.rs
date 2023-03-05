@@ -54,14 +54,17 @@ pub fn is_did(value: &str, class: &str) -> bool {
     }
 }
 
+#[allow(dead_code)]
 fn json_parse<T: Sized + Serialize>(value: T) -> Value {
     json!(value)
 }
 
+#[allow(dead_code)]
 fn json_stringify<T: Sized + Serialize>(value: &T) -> String {
     serde_json::to_string(value).unwrap_or_default()
 }
 
+#[allow(dead_code)]
 /// Removes the last two numbers of the hashkey and replace it with the respecpective binaries.
 /// If bin_one == 0, it means the DID owns the file.
 /// If bin_one == 0, it means the DID has access to the file
@@ -70,19 +73,18 @@ pub fn format_hk<'a>(hk: &'a str, bin_one: u32, bin_two: u32) -> String {
     format!("{}{}{}", &hk[0..length], bin_one, bin_two)
 }
 
-/// calculates the hashkey based on its imput
+/// calculates the hashkey based on its input
 pub fn get_hashkey(subject_did: &str, object_did: &str) -> HashKey {
     let hash_key: HashKey;
     if object_did == "" {
-        let hk = gen_hash(subject_did);
-        let hashkey_buf = format_hk(&format!("{hk}"), 0, 0);
-        hash_key = u64::from_str_radix(&hashkey_buf, 10).unwrap_or_default();
+        hash_key = gen_hash(subject_did);
+        // let hashkey_buf = format_hk(&format!("{hk}"), 0, 0);
+        // hash_key = u64::from_str_radix(&hk, 10).unwrap_or_default();
     } else {
         // combine the object and subject to form the hashkey
-        let hk = gen_hash(&format!("{}{}", subject_did, object_did));
-        let hashkey_buf = format_hk(&format!("{hk}"), 1, 0); // app has access but did owns the data
-        hash_key = u64::from_str_radix(&hashkey_buf, 10).unwrap_or_default();
+        hash_key = gen_hash(&format!("{}{}", subject_did, object_did));
+        // let hashkey_buf = format_hk(&format!("{hk}"), 1, 0); // app has access but did owns the data
+        // hash_key = u64::from_str_radix(&hk, 10).unwrap_or_default();
     }
-
     hash_key
 }
