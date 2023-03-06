@@ -60,7 +60,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
             // sleep for some seconds
             thread::sleep(Duration::from_secs(config.ipfs_sync_interval));
 
-            println!("{} cycle", count);
+            println!("[{}] ->  sync cycle", count);
             count += 1;
 
             // sync
@@ -152,6 +152,9 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
                 } else {
                     // add to database auth_list for high speed auth
                     db.add_auth_account(&did, password);
+
+                    // start to populate the database with IPFS data
+                    db.populate_db(config, &did);
                 }
             }
             Response::Single(did.to_owned())
@@ -180,7 +183,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
 
-            match db.get(hash_key, nkey, subject_did) {
+            match db.get(config, hash_key, nkey, subject_did) {
                 Some(value) => Response::Double {
                     one: key.to_owned(),
                     two: value.to_owned(),
@@ -220,7 +223,15 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
                 0
             };
 
-            let previous = db.insert(subject_key, object_key, hash_key, nkey, value.clone());
+            let previous = db.insert(
+                config,
+                key,
+                subject_key,
+                object_key,
+                hash_key,
+                nkey,
+                value.clone(),
+            );
 
             // write file metadata
             db.write_metadata(hash_key, subject_did, object_did);

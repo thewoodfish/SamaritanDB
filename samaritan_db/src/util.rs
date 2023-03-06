@@ -1,5 +1,8 @@
 use crate::sam_prelude::*;
-use std::hash::Hasher;
+use std::{
+    hash::Hasher,
+    time::{SystemTime, UNIX_EPOCH},
+};
 
 use fnv::FnvHasher;
 use rand::{distributions::Alphanumeric, thread_rng, Rng};
@@ -87,4 +90,12 @@ pub fn get_hashkey(subject_did: &str, object_did: &str) -> HashKey {
         // hash_key = u64::from_str_radix(&hk, 10).unwrap_or_default();
     }
     hash_key
+}
+
+/// return now, as in this instant as a Unix Timestamp
+pub fn get_timestamp() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs()
 }

@@ -11,7 +11,7 @@ type DatabaseMetadata = String;
 type AccountId = String;
 
 #[derive(Default, Debug)]
-
+#[allow(dead_code)]
 struct FileMeta {
     access_list: Vec<AccountId>,
     cid: IpfsCid,
@@ -20,7 +20,7 @@ struct FileMeta {
 }
 
 #[derive(Default, Debug)]
-
+#[allow(dead_code)]
 struct UserInfo {
     auth_content: AuthContent,
     did_doc_cid: IpfsCid,
@@ -35,11 +35,12 @@ pub struct SamOs {
     /// Storage for user documents metadata
     files_meta: Mapping<HashKey, FileMeta>,
     /// Stores the access list of a file for easy retreival
-    access_list: Mapping<DID, (HashKey, i64)>,
+    access_list: Mapping<DID, Mapping<HashKey, i64>>,
 }
 
 impl SamOs {
     /// Constructor that initializes all the contract storage to default
+    #[allow(dead_code)]
     pub fn new() -> Self {
         SamOs {
             auth_list: Mapping::new(),
@@ -84,35 +85,90 @@ impl SamOs {
             .unwrap_or_default()
             .as_secs();
 
-        // created access list
+        let old_dids: Vec<String> = if dids[0] == "".to_string() {
+            // get the previous metadata to retreive the DID(s)
+            let new_meta = FileMeta::new();
+            let tmp = self.files_meta.get(&hk).unwrap_or(&new_meta);
+            tmp.access_list.clone()
+        } else {
+            dids.to_vec()
+        };
 
+        // created access list
         let meta = FileMeta {
-            access_list: dids.to_vec(),
+            access_list: old_dids,
             cid: cid.to_owned(),
             modified: now,
             db_meta: metadata.to_string(),
         };
-
         self.files_meta.insert(hk, meta);
 
         let mut index = 0;
         for did in dids {
-            self.access_list.insert(
-                did.to_owned(),
-                (
-                    hk,
-                    if access_bits[index] {
-                        -1
-                    } else {
-                        // keep it as is or set to 0
-                        match self.access_list.get(did) {
-                            Some(entry) => entry.1,
+            // get the DIDs files
+            let mut files = self.access_list.get(did).unwrap_or(&HashMap::new()).clone();
+            files.insert(
+                hk,
+                if !access_bits[index] {
+                    -1
+                } else {
+                    // keep it as is or set to 0
+                    match self.access_list.get(did) {
+                        Some(entry) => match entry.get(&hk) {
+                            Some(e) => e.clone(),
                             None => 0,
-                        }
-                    },
-                ),
-            ); // 0 means infinity and there's no cap on time for now
+                        },
+                        None => 0,
+                    }
+                },
+            );
+            // 0 means infinity and there's no cap on time for now
             index += 0;
+
+            // save
+            if files.len() > 0 {
+                self.access_list.insert(did.to_string(), files);
+            };
+        }
+    }
+
+    /// Return random files that a did has access to.
+    /// This helps to populate the database initially
+    pub fn get_random_files(&self, did: &str) -> Option<Vec<(HashKey, String)>> {
+        if let Some(files) = self.access_list.get(did) {
+            let collator: Vec<(HashKey, String)> = files
+                .iter()
+                .map(|(k, v)| {
+                    // get the file latest CID if allowed
+                    if *v != -1 {
+                        let cid = match self.files_meta.get(k) {
+                            Some(meta) => meta.cid.clone(),
+                            None => Default::default(),
+                        };
+                        (k.clone(), cid)
+                    } else {
+                        (k.clone(), Default::default())
+                    }
+                })
+                .filter(|(_, s)| s.len() > 0)
+                .take(50)
+                .collect();
+
+            Some(collator)
+        } else {
+            None
+        }
+    }
+}
+
+impl FileMeta {
+    /// Constructor that gives a new metadata
+    pub fn new() -> Self {
+        Self {
+            access_list: Default::default(),
+            cid: Default::default(),
+            modified: Default::default(),
+            db_meta: Default::default(),
         }
     }
 }
@@ -159,6 +215,12 @@ pub mod interface {
     ) {
         let mut guard = cfg.contract_storage.lock().unwrap();
         guard.update_file_meta(cid, hashkey, &cfg.metadata, dids, access_bits);
+    }
+
+    /// get initial random files to populate the database quickly
+    pub fn get_init_files(cfg: &Arc<Config>, did: &str) -> Vec<(HashKey, String)> {
+        let guard = cfg.contract_storage.lock().unwrap();
+        guard.get_random_files(did).unwrap_or_default()
     }
 }
 
