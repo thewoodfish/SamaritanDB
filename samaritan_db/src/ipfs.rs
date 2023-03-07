@@ -1,6 +1,6 @@
 use crate::{
     contract::interface,
-    sam_prelude::{Config, HashKey},
+    sam_prelude::{Config, HashKey, Metadata},
     util,
 };
 use serde_json::{self, json, Value};
@@ -9,6 +9,7 @@ use std::{collections::HashMap, fs, process::Command, sync::Arc};
 /// This function interfaces with IPFS and handles all operations involving IPFS
 pub fn sync_data(
     cfg: &Arc<Config>,
+    meta: &Metadata,
     db_data: &HashMap<String, String>,
     new: bool,
     cid: &str,
@@ -47,9 +48,21 @@ pub fn sync_data(
                 let mut kv_map = kv_map_result.unwrap_or_default();
 
                 // combine this kv_map with the result from the database
-                let _ = (*db_data).iter().map(|(k, v)| {
-                    kv_map.insert(k.clone(), v.clone());
-                }).collect::<()>();
+                let _ = (*db_data)
+                    .iter()
+                    .map(|(k, v)| {
+                        kv_map.insert(k.clone(), v.clone());
+                    })
+                    .collect::<()>();
+
+                // enforce the deleted keys
+                let _ = meta
+                    .deleted_keys
+                    .iter()
+                    .map(|k| {
+                        kv_map.remove(k);
+                    })
+                    .collect::<()>();
 
                 // encode as JSON
                 let encoded_data = json!(kv_map);

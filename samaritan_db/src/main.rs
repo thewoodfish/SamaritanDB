@@ -193,6 +193,40 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
                 },
             }
         }
+        Request::Del {
+            subject_did,
+            key,
+            object_did,
+        } => {
+            // check for auth
+            if !db.account_is_auth(&subject_did) {
+                return Response::Error {
+                    msg: format!("account with did:'{}' not recognized", subject_did),
+                };
+            }
+
+            if object_did != "" {
+                if !db.account_is_auth(&object_did) {
+                    return Response::Error {
+                        msg: format!("account with did:'{}' not recognized", object_did),
+                    };
+                }
+            }
+
+            // calculate hashkey
+            let hash_key: HashKey = get_hashkey(subject_did, object_did);
+            let nkey = gen_hash(key);
+
+            match db.del(key, hash_key, nkey, subject_did) {
+                Some(value) => Response::Double {
+                    one: key.to_owned(),
+                    two: value.to_owned(),
+                },
+                None => Response::Error {
+                    msg: format!("no key: '{}'", key),
+                },
+            }
+        }
         Request::Insert {
             subject_did,
             key,

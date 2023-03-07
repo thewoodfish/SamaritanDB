@@ -55,6 +55,8 @@ pub struct Metadata {
     modified: u64,
     /// ipfs sync timestamp
     ipfs_sync_timestamp: u64,
+    /// deleted keys, for syncing across the network
+    pub deleted_keys: Vec<String>,
 }
 
 /// Possible requests our clients can send us
@@ -68,6 +70,11 @@ pub enum Request<'a> {
         password: &'a str,
     },
     Get {
+        subject_did: &'a str,
+        key: &'a str,
+        object_did: &'a str,
+    },
+    Del {
         subject_did: &'a str,
         key: &'a str,
         object_did: &'a str,
@@ -221,6 +228,56 @@ impl Database {
         }
     }
 
+    /// delete an entry from the database
+    pub fn del(
+        &self,
+        string_key: &str,
+        file_key: HashKey,
+        data_key: HashKey,
+        subject_did: &str,
+    ) -> Option<String> {
+        // check for access permissions from the metadata
+        let mut index = 0;
+        let guard = self.metacache.lock().unwrap();
+        if let Some(meta) = guard.get(&file_key) {
+            if &meta.dids[index] == subject_did {
+            } else if &meta.dids[index] == subject_did {
+                index += 1;
+            } else {
+                return None;
+            }
+
+            // then use that index to check the access permissions
+            if !meta.access_bits[index] {
+                return None;
+            }
+        }
+
+        // now try to read the entry if it exists
+        // get the data
+        let mut guard = self.file_lookup_table.lock().unwrap();
+        if let Some(kv_store_ref) = guard.get(&file_key) {
+            let mut kv_store = kv_store_ref.clone();
+            match kv_store.remove(&data_key) {
+                Some(val) => {
+                    guard.insert(file_key, kv_store);
+
+                    // update metadata
+                    let mut mguard = self.metacache.lock().unwrap();
+                    if let Some(meta_ref) = mguard.get(&file_key) {
+                        let mut meta = meta_ref.clone();
+                        meta.deleted_keys.push(string_key.into());
+                        mguard.insert(file_key, meta);
+                    }
+                    Some(val.clone())
+                }
+                None => None,
+            }
+        } else {
+            None
+        }
+    }
+
     /// get a snapshot of the database
     pub fn snapshot(&self) {
         println!("-----------------------------");
@@ -247,6 +304,7 @@ impl Database {
             access_bits: [true, true],
             modified: now,
             ipfs_sync_timestamp: 0,
+            deleted_keys: Default::default(),
         };
 
         // save file metadata
@@ -260,78 +318,96 @@ impl Database {
         let mut metadata = self.metacache.lock().unwrap().clone();
         let mut value_hashmap: HashMap<String, String> = Default::default();
 
-        let _ = metadata.iter_mut().map(|(hk, m)| {
-            // first check the smart contract for the latest version of the file
-            let file_info = interface::get_file_info(cfg, *hk);
-            let ipfs_cid = file_info.1;
-            let default = HashMap::<HashKey, String>::new();
-            let default_meta = Metadata::new();
+        let _ = metadata
+            .iter_mut()
+            .map(|(hk, m)| {
+                // first check the smart contract for the latest version of the file
+                let file_info = interface::get_file_info(cfg, *hk);
+                let ipfs_cid = file_info.1;
+                let default = HashMap::<HashKey, String>::new();
+                let default_meta = Metadata::new();
 
-            let mut mguard = self.metacache.lock().unwrap();
-            let metadata = mguard.get(hk).unwrap_or(&default_meta);
+                let mut mguard = self.metacache.lock().unwrap();
+                let metadata = mguard.get(hk).unwrap_or(&default_meta);
 
-            // get data we want to sync
-            let guard = self.file_lookup_table.lock().unwrap().clone();
-            let data = guard.get(hk).unwrap_or(&default).clone();
-            // Get all the string part of the data
-            // They contain all the unhashed key and the value.
-            let _ = data.iter().map(|(_, v)| {
-                let split = cfg.get_separator();
-                let mut value = v.split(&split);
+                // get data we want to sync
+                let guard = self.file_lookup_table.lock().unwrap().clone();
+                let data = guard.get(hk).unwrap_or(&default).clone();
+                // Get all the string part of the data
+                // They contain all the unhashed key and the value.
+                let _ = data
+                    .iter()
+                    .map(|(_, v)| {
+                        let split = cfg.get_separator();
+                        let mut value = v.split(&split);
 
-                // get key and value of string
-                let inner_key = value.next().unwrap_or_default().into();
-                let inner_value = value.next().unwrap_or_default().into();
-                value_hashmap.insert(inner_key, inner_value);
-            }).collect::<()>();
-            let fresh_data: Box<HashMap<String, String>>;
+                        // get key and value of string
+                        let inner_key = value.next().unwrap_or_default().into();
+                        let inner_value = value.next().unwrap_or_default().into();
+                        value_hashmap.insert(inner_key, inner_value);
+                    })
+                    .collect::<()>();
+                let fresh_data: Box<HashMap<String, String>>;
 
-            // check timestamp
-            if file_info.0 != 0 {
-                // check if we have an outdated copy
-                if file_info.0 > metadata.ipfs_sync_timestamp
-                    || m.modified > metadata.ipfs_sync_timestamp
-                {
-                    // sync data
-                    fresh_data = ipfs::sync_data(
+                // check timestamp
+                if file_info.0 != 0 {
+                    // check if we have an outdated copy
+                    if file_info.0 > metadata.ipfs_sync_timestamp
+                        || m.modified > metadata.ipfs_sync_timestamp
+                    {
+                        // sync data
+                        fresh_data = ipfs::sync_data(
+                            &cfg,
+                            metadata,
+                            &value_hashmap,
+                            false,
+                            &ipfs_cid,
+                            *hk,
+                            &m.dids,
+                            &m.access_bits,
+                        );
+
+                        // update memory data
+                        let data_collator = Self::restructure_kvstore(cfg, &fresh_data);
+                        // now input the data
+                        let mut guard = self.file_lookup_table.lock().unwrap();
+                        guard.insert(*hk, data_collator);
+
+                        // update metadata ipfs timestamp
+                        let now = get_timestamp();
+
+                        // save file metadata
+                        match mguard.get(hk) {
+                            Some(entry) => {
+                                let mut meta = (*entry).clone();
+                                meta.ipfs_sync_timestamp = now;
+                                // clear all deleted items
+                                meta.deleted_keys = Vec::new();
+
+                                // save
+                                mguard.insert(*hk, meta);
+                            }
+                            None => {}
+                        }
+                    } else {
+                        // do nothing, we're up to date
+                        println!("reach here !!");
+                    }
+                } else {
+                    // push the first copy to IPFS
+                    ipfs::sync_data(
                         &cfg,
+                        metadata,
                         &value_hashmap,
-                        false,
-                        &ipfs_cid,
+                        true,
+                        "",
                         *hk,
                         &m.dids,
                         &m.access_bits,
                     );
-
-                    // update memory data
-                    let data_collator = Self::restructure_kvstore(cfg, &fresh_data);
-                    // now input the data
-                    let mut guard = self.file_lookup_table.lock().unwrap();
-                    guard.insert(*hk, data_collator);
-
-                    // update metadata ipfs timestamp
-                    let now = get_timestamp();
-
-                    // save file metadata
-                    match mguard.get(hk) {
-                        Some(entry) => {
-                            let mut meta = (*entry).clone();
-                            meta.ipfs_sync_timestamp = now;
-
-                            // save
-                            mguard.insert(*hk, meta);
-                        }
-                        None => {}
-                    }
-                } else {
-                    // do nothing, we're up to date
-                    println!("reach here !!");
                 }
-            } else {
-                // push the first copy to IPFS
-                ipfs::sync_data(&cfg, &value_hashmap, true, "", *hk, &m.dids, &m.access_bits);
-            }
-        }).collect::<()>();
+            })
+            .collect::<()>();
     }
 
     /// takes a HashMap<String, String>, hashes the first as the key and combines the two as the value
@@ -340,14 +416,17 @@ impl Database {
         fresh_data: &HashMap<String, String>,
     ) -> HashMap<HashKey, String> {
         let mut data_collator = HashMap::<u64, String>::new();
-        let _ = fresh_data.iter().map(|(k, v)| {
-            // hash the key
-            let hashk = gen_hash(k);
-            // combine them
-            let combined = format!("{}{}{}", k, cfg.get_separator(), v);
-            // input the datax
-            data_collator.insert(hashk, combined);
-        }).collect::<()>();
+        let _ = fresh_data
+            .iter()
+            .map(|(k, v)| {
+                // hash the key
+                let hashk = gen_hash(k);
+                // combine them
+                let combined = format!("{}{}{}", k, cfg.get_separator(), v);
+                // input the datax
+                data_collator.insert(hashk, combined);
+            })
+            .collect::<()>();
 
         data_collator.clone()
     }
@@ -361,25 +440,29 @@ impl Database {
         // we have the CID now, so begin fetching
         let data = ipfs::fetch_fresh_data(&sc_data);
         // then begin writing to data-base
-        let _ = data.iter().map(|(hk, hm)| {
-            let mut guard = self.file_lookup_table.lock().unwrap();
-            let refined_data = Self::restructure_kvstore(cfg, hm);
+        let _ = data
+            .iter()
+            .map(|(hk, hm)| {
+                let mut guard = self.file_lookup_table.lock().unwrap();
+                let refined_data = Self::restructure_kvstore(cfg, hm);
 
-            // now insert the data
-            guard.insert(*hk, refined_data);
+                // now insert the data
+                guard.insert(*hk, refined_data);
 
-            let now = get_timestamp();
+                let now = get_timestamp();
 
-            // update metadata also
-            let meta = Metadata {
-                dids: ["".to_string(), "".to_string()],
-                access_bits: [true, true], // has to be
-                modified: now,
-                ipfs_sync_timestamp: now,
-            };
-            let mut mguard = self.metacache.lock().unwrap();
-            mguard.insert(*hk, meta);
-        }).collect::<()>();
+                // update metadata also
+                let meta = Metadata {
+                    dids: ["".to_string(), "".to_string()],
+                    access_bits: [true, true], // has to be
+                    modified: now,
+                    ipfs_sync_timestamp: now,
+                    deleted_keys: Default::default(),
+                };
+                let mut mguard = self.metacache.lock().unwrap();
+                mguard.insert(*hk, meta);
+            })
+            .collect::<()>();
     }
 }
 
@@ -405,6 +488,7 @@ impl Metadata {
             access_bits: Default::default(),
             modified: Default::default(),
             ipfs_sync_timestamp: Default::default(),
+            deleted_keys: Default::default(),
         }
     }
 }
@@ -420,7 +504,42 @@ impl<'a> Request<'a> {
                         if is_did(did, "all") => {
                             did
                         },
-                    _ => return Err("INSERT must be followed by a SamOs DID".into()),
+                    _ => return Err("GET must be followed by a SamOS DID".into()),
+                };
+
+                // retreive the key
+                let key = match parts.next() {
+                    Some(key) => key,
+                    None => return Err("a key must be specified for insertion".into()),
+                };
+                // check if theres a value after - Must be a user DID
+                let object_did = match parts.next() {
+                    Some(did) => {
+                        if is_did(did, "user") && is_did(subject_did, "app") {
+                            did
+                        } else {
+                            return Err(
+                                "the last value, if present, must be a Samaritans DID".into()
+                            );
+                        }
+                    }
+                    None => "",
+                };
+
+                Ok(Request::Del {
+                    subject_did,
+                    key,
+                    object_did,
+                })
+            }
+            Some("DEL") => {
+                let subject_did = match parts.next() {
+                    Some(did) 
+                        // the first parameter must be a DID
+                        if is_did(did, "all") => {
+                            did
+                        },
+                    _ => return Err("INSERT must be followed by a SamOS DID".into()),
                 };
 
                 // retreive the key
