@@ -106,29 +106,31 @@ impl SamOs {
         let mut index = 0;
         for did in dids {
             // get the DIDs files
-            let mut files = self.access_list.get(did).unwrap_or(&HashMap::new()).clone();
-            files.insert(
-                hk,
-                if !access_bits[index] {
-                    -1
-                } else {
-                    // keep it as is or set to 0
-                    match self.access_list.get(did) {
-                        Some(entry) => match entry.get(&hk) {
-                            Some(e) => e.clone(),
+            if !did.is_empty() {
+                let mut files = self.access_list.get(did).unwrap_or(&HashMap::new()).clone();
+                files.insert(
+                    hk,
+                    if !access_bits[index] {
+                        -1
+                    } else {
+                        // keep it as is or set to 0
+                        match self.access_list.get(did) {
+                            Some(entry) => match entry.get(&hk) {
+                                Some(e) => e.clone(),
+                                None => 0,
+                            },
                             None => 0,
-                        },
-                        None => 0,
-                    }
-                },
-            );
-            // 0 means infinity and there's no cap on time for now
-            index += 0;
+                        }
+                    },
+                );
+                // 0 means infinity and there's no cap on time for now
+                index += 0;
 
-            // save
-            if files.len() > 0 {
-                self.access_list.insert(did.to_string(), files);
-            };
+                // save
+                if files.len() > 0 {
+                    self.access_list.insert(did.to_string(), files);
+                };
+            }
         }
     }
 
@@ -157,6 +159,25 @@ impl SamOs {
             Some(collator)
         } else {
             None
+        }
+    }
+
+    /// Revokes app access to a users data
+    pub fn revoke_app_access(&mut self, file_key: HashKey, app_did: &str) -> bool {
+        // get app entry
+        if let Some(entry) = self.access_list.get(app_did) {
+            let mut new_entry = entry.clone();
+            match (*entry).get(&file_key) {
+                Some(_) => {
+                    // set to -1 to revoke the access and deny the app entry
+                    new_entry.insert(file_key, -1);
+                    self.access_list.insert(app_did.to_owned(), new_entry);
+                    true
+                }
+                None => false,
+            }
+        } else {
+            false
         }
     }
 }
@@ -221,6 +242,13 @@ pub mod interface {
     pub fn get_init_files(cfg: &Arc<Config>, did: &str) -> Vec<(HashKey, String)> {
         let guard = cfg.contract_storage.lock().unwrap();
         guard.get_random_files(did).unwrap_or_default()
+    }
+
+    /// revoke an apps access to user data
+    pub fn revoke_app_access(cfg: &Arc<Config>, file_key: HashKey, app_did: &str) -> bool {
+        // call the smart contract
+        let mut guard = cfg.contract_storage.lock().unwrap();
+        guard.revoke_app_access(file_key, app_did)
     }
 }
 

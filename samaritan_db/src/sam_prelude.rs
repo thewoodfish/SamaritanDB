@@ -10,8 +10,6 @@ use crate::{
 
 // custom defined types
 pub type HashKey = u64;
-pub type DIDKey = u64;
-pub type FileKey = u64;
 
 pub type MetaMap = HashMap<HashKey, Metadata>;
 
@@ -25,10 +23,8 @@ pub struct Database {
     metacache: Mutex<MetaMap>,
     /// list of authenticated DIDs
     auth_list: Mutex<HashMap<HashKey, HashKey>>,
-    /// table that maps did to the files they own
-    did_file_table: Mutex<HashMap<DIDKey, FileKey>>,
     /// table matching files and its contents
-    file_lookup_table: Mutex<HashMap<FileKey, HashMap<HashKey, String>>>,
+    file_lookup_table: Mutex<HashMap<HashKey, HashMap<HashKey, String>>>,
 }
 
 /// The struct that describes behaviour of the database
@@ -78,6 +74,10 @@ pub enum Request<'a> {
         subject_did: &'a str,
         key: &'a str,
         object_did: &'a str,
+    },
+    Revoke {
+        revoker_did: &'a str,
+        app_did: &'a str,
     },
     Insert {
         subject_did: &'a str,
@@ -145,20 +145,10 @@ impl Database {
         &self,
         cfg: &Arc<Config>,
         data_key: &str,
-        subject_key: HashKey,
-        object_key: HashKey,
         hashkey: HashKey,
         key: HashKey,
         value: String,
     ) -> String {
-        let mut guard = self.did_file_table.lock().unwrap();
-        // update the did file table entry
-        guard.entry(subject_key).or_insert(hashkey);
-        // do same for object did, if there is any
-        if object_key != 0 {
-            guard.entry(object_key).or_insert(hashkey);
-        }
-
         // previous data
         let previous_data: Option<String>;
         // the unhashed key and the value are stored together
@@ -228,9 +218,27 @@ impl Database {
         }
     }
 
+    /// revoke app access to user data
+    pub fn revoke(&self, cfg: &Arc<Config>, file_key: HashKey, app_did: &str) -> bool {
+        // check for access permissions from the metadata
+        let index = 0; // apps always take the first index
+        let mut guard = self.metacache.lock().unwrap();
+        // check if its in current memory
+        if let Some(meta) = guard.get(&file_key) {
+            // revoke the apps access
+            let mut mdata = meta.clone();
+            mdata.access_bits[index] = false;
+            guard.insert(file_key, mdata);
+        }
+
+        // revoke it as smart contract level
+        interface::revoke_app_access(cfg, file_key, app_did)
+    }
+
     /// delete an entry from the database
     pub fn del(
         &self,
+        cfg: &Arc<Config>,
         string_key: &str,
         file_key: HashKey,
         data_key: HashKey,
@@ -238,8 +246,8 @@ impl Database {
     ) -> Option<String> {
         // check for access permissions from the metadata
         let mut index = 0;
-        let guard = self.metacache.lock().unwrap();
-        if let Some(meta) = guard.get(&file_key) {
+        let mut mguard = self.metacache.lock().unwrap();
+        if let Some(meta) = mguard.get(&file_key) {
             if &meta.dids[index] == subject_did {
             } else if &meta.dids[index] == subject_did {
                 index += 1;
@@ -263,13 +271,19 @@ impl Database {
                     guard.insert(file_key, kv_store);
 
                     // update metadata
-                    let mut mguard = self.metacache.lock().unwrap();
                     if let Some(meta_ref) = mguard.get(&file_key) {
                         let mut meta = meta_ref.clone();
                         meta.deleted_keys.push(string_key.into());
+                        meta.modified = get_timestamp();
                         mguard.insert(file_key, meta);
                     }
-                    Some(val.clone())
+
+                    let value = val
+                        .split(&cfg.get_separator())
+                        .skip(1)
+                        .next()
+                        .unwrap_or("not found");
+                    Some(value.into())
                 }
                 None => None,
             }
@@ -279,7 +293,7 @@ impl Database {
     }
 
     /// get a snapshot of the database
-    pub fn snapshot(&self) {
+    pub fn snapshot(&self, cfg: &Arc<Config>) {
         println!("-----------------------------");
         let guard = self.metacache.lock().unwrap();
         println!("metacache -> {:#?}", guard);
@@ -287,29 +301,37 @@ impl Database {
         let guard = self.auth_list.lock().unwrap();
         println!("auth_list -> {:#?}", guard);
 
-        let guard = self.did_file_table.lock().unwrap();
-        println!("did_file_table -> {:#?}", guard);
-
         let guard = self.file_lookup_table.lock().unwrap();
         println!("file_lookup_table -> {:#?}", guard);
+
+        let guard = cfg.contract_storage.lock().unwrap();
+        println!("contract-state -> {:#?}", guard);
         println!("-----------------------------");
     }
 
     /// write important file details to metadata
     pub fn write_metadata(&self, file_hk: HashKey, subject_did: &str, object_did: &str) {
         let now = get_timestamp();
-        // set up metadata
-        let meta = Metadata {
-            dids: [subject_did.to_owned(), object_did.to_owned()],
-            access_bits: [true, true],
-            modified: now,
-            ipfs_sync_timestamp: 0,
-            deleted_keys: Default::default(),
-        };
-
-        // save file metadata
         let mut guard = self.metacache.lock().unwrap();
-        guard.insert(file_hk, meta);
+        // set up metadata
+        // first check if metadata exists {
+
+        if let Some(m) = guard.get(&file_hk) {
+            let mut meta = m.clone();
+            meta.modified = now;
+            // save file metadata
+            guard.insert(file_hk, meta);
+        } else {
+            let meta = Metadata {
+                dids: [subject_did.to_owned(), object_did.to_owned()],
+                access_bits: [true, true],
+                modified: now,
+                ipfs_sync_timestamp: 0,
+                deleted_keys: Default::default(),
+            };
+            // save file metadata
+            guard.insert(file_hk, meta);
+        }
     }
 
     /// This will be dealing majorly with the matadata cache of the files.
@@ -405,6 +427,17 @@ impl Database {
                         &m.dids,
                         &m.access_bits,
                     );
+                    let now = get_timestamp();
+
+                    // update ipfs sync timestamp
+                    match mguard.get(hk) {
+                        Some(entry) => {
+                            let mut meta = (*entry).clone();
+                            meta.ipfs_sync_timestamp = now;
+                            mguard.insert(*hk, meta);
+                        }
+                        None => {}
+                    }
                 }
             })
             .collect::<()>();
@@ -526,7 +559,7 @@ impl<'a> Request<'a> {
                     None => "",
                 };
 
-                Ok(Request::Del {
+                Ok(Request::Get {
                     subject_did,
                     key,
                     object_did,
@@ -539,7 +572,7 @@ impl<'a> Request<'a> {
                         if is_did(did, "all") => {
                             did
                         },
-                    _ => return Err("INSERT must be followed by a SamOS DID".into()),
+                    _ => return Err("DEL must be followed by a SamOS DID".into()),
                 };
 
                 // retreive the key
@@ -561,7 +594,7 @@ impl<'a> Request<'a> {
                     None => "",
                 };
 
-                Ok(Request::Get {
+                Ok(Request::Del {
                     subject_did,
                     key,
                     object_did,
@@ -615,7 +648,7 @@ impl<'a> Request<'a> {
                     .next()
                     .ok_or("password must be specified after DID type")?;
 
-                // check password length and content
+                // check password length and contentx
                 if password.chars().all(char::is_alphabetic)
                     || password.chars().all(char::is_numeric)
                     || password.len() < 8
@@ -623,6 +656,24 @@ impl<'a> Request<'a> {
                     return Err("password must be aplhanumeric and more than 8 characters".into());
                 }
                 Ok(Request::New { class, password })
+            }
+            Some("REVOKE") => {
+                let revoker_did = parts.next().ok_or("REVOKE must be followed by a DID")?;
+                if !is_did(revoker_did, "user") {
+                    return Err("REVOKE must be followed by a Samaritans DID".into());
+                }
+
+                let app_did = parts
+                    .next()
+                    .ok_or("an app DID must be present for revocation")?;
+                if !is_did(app_did, "app") {
+                    return Err("an app DID must be present for revocation".into());
+                }
+
+                Ok(Request::Revoke {
+                    revoker_did,
+                    app_did,
+                })
             }
             Some("INIT") => {
                 let did = parts.next().ok_or("INIT must be followed by a DID")?;

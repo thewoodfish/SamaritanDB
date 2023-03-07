@@ -12,10 +12,9 @@ use tokio_util::codec::{Framed, LinesCodec};
 
 use futures::SinkExt;
 use std::error::Error;
+use std::sync::Arc;
 use std::time::Duration;
 use std::{env, thread};
-// use std::fmt::format;
-use std::sync::Arc;
 use util::*;
 
 mod contract;
@@ -96,7 +95,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 let response = response.serialize();
 
                                 // log state of database
-                                db.snapshot();
+                                db.snapshot(&config);
 
                                 if let Err(e) = lines.send(response.as_str()).await {
                                     println!("error on sending response; error = {:?}", e);
@@ -159,6 +158,33 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             }
             Response::Single(did.to_owned())
         }
+        Request::Revoke {
+            revoker_did,
+            app_did,
+        } => {
+            // check for auth
+            if !db.account_is_auth(&revoker_did) {
+                return Response::Error {
+                    msg: format!("account with did:'{}' not recognized", revoker_did),
+                };
+            }
+
+            if !db.account_is_auth(&app_did) {
+                return Response::Error {
+                    msg: format!("account with did:'{}' not recognized", app_did),
+                };
+            }
+
+            // calculate hashkey
+            let hash_key: HashKey = get_hashkey(app_did, revoker_did);
+            if db.revoke(config, hash_key, app_did) {
+                Response::Single(app_did.to_owned())
+            } else {
+                Response::Error {
+                    msg: format!("no links found between '{}' and '{}'", revoker_did, app_did),
+                }
+            }
+        }
         Request::Get {
             subject_did,
             key,
@@ -217,7 +243,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
 
-            match db.del(key, hash_key, nkey, subject_did) {
+            match db.del(&config, key, hash_key, nkey, subject_did) {
                 Some(value) => Response::Double {
                     one: key.to_owned(),
                     two: value.to_owned(),
@@ -250,22 +276,8 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
 
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
-            let subject_key = gen_hash(subject_did);
-            let object_key = if object_did != "" {
-                gen_hash(object_did)
-            } else {
-                0
-            };
 
-            let previous = db.insert(
-                config,
-                key,
-                subject_key,
-                object_key,
-                hash_key,
-                nkey,
-                value.clone(),
-            );
+            let previous = db.insert(config, key, hash_key, nkey, value.clone());
 
             // write file metadata
             db.write_metadata(hash_key, subject_did, object_did);
