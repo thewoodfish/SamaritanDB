@@ -95,7 +95,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
                                 let response = response.serialize();
 
                                 // log state of database
-                                db.snapshot(&config);
+                                db.snapshot();
 
                                 if let Err(e) = lines.send(response.as_str()).await {
                                     println!("error on sending response; error = {:?}", e);
@@ -124,7 +124,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
         Request::New { class, password } => {
             let did = get_did(class);
             // create the new user on chain
-            if interface::create_new_account(&did, password, config) {
+            if interface::create_new_account(&did, password) {
                 // add to database auth_list for high speed auth
                 db.add_auth_account(&did, password);
                 Response::Double {
@@ -141,10 +141,10 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             // check the database cache for an entry
             if !db.account_is_alive(&did, password) {
                 // check the smart contract for account entry
-                if !interface::account_is_auth(&did, config, password) {
+                if !interface::account_is_auth(&did, password) {
                     return Response::Error {
                         msg: format!(
-                            "account with did:'{}' and password:'{} not recognized",
+                            "account with did:'{}' and password:'{}' not recognized",
                             did, password
                         ),
                     };
@@ -161,6 +161,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
         Request::Revoke {
             revoker_did,
             app_did,
+            revoke,
         } => {
             // check for auth
             if !db.account_is_auth(&revoker_did) {
@@ -177,7 +178,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
 
             // calculate hashkey
             let hash_key: HashKey = get_hashkey(app_did, revoker_did);
-            if db.revoke(config, hash_key, app_did) {
+            if db.revoke(hash_key, app_did, revoke) {
                 Response::Single(app_did.to_owned())
             } else {
                 Response::Error {

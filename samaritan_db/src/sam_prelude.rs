@@ -2,7 +2,7 @@ use std::sync::Arc;
 use std::{collections::HashMap, sync::Mutex};
 
 use crate::contract::interface;
-use crate::{contract::SamOs, util};
+use crate::util;
 use crate::{
     ipfs::{self},
     util::*,
@@ -30,14 +30,23 @@ pub struct Database {
 /// The struct that describes behaviour of the database
 #[derive(Default)]
 pub struct Config {
-    /// contract storage
-    pub contract_storage: Mutex<SamOs>,
     /// IPFS synchronization interval
     pub ipfs_sync_interval: u64,
     /// Database Metadata i.e info about database
     pub metadata: String,
     /// Key-value in-memory separator
     separator: String,
+}
+
+/// This is a tempopary data structure used to hold data breifly on initialization
+#[derive(Default, Debug, Clone)]
+pub struct TmpData {
+    pub dids: Vec<String>,
+    pub cid: String,
+    pub nonce: u64,
+    pub access_bit: i32,
+    pub hash_key: HashKey,
+    pub cache: HashMap<String, String>,
 }
 
 /// The struct containing important file information
@@ -51,6 +60,8 @@ pub struct Metadata {
     modified: u64,
     /// ipfs sync timestamp
     ipfs_sync_timestamp: u64,
+    /// ipfs syunc nonce
+    ipfs_sync_nonce: u64,
     /// deleted keys, for syncing across the network
     pub deleted_keys: Vec<String>,
 }
@@ -78,6 +89,7 @@ pub enum Request<'a> {
     Revoke {
         revoker_did: &'a str,
         app_did: &'a str,
+        revoke: bool,
     },
     Insert {
         subject_did: &'a str,
@@ -130,7 +142,14 @@ impl Database {
         let guard = self.auth_list.lock().unwrap();
         match guard.get(&util::gen_hash(did)) {
             Some(_) => true,
-            None => false,
+            None => {
+                // check the contract
+                if interface::account_exists(did) {
+                    true
+                } else {
+                    false
+                }
+            }
         }
     }
 
@@ -170,7 +189,16 @@ impl Database {
             // save data
             guard.insert(hashkey, kv_pair);
         }
-        previous_data.unwrap_or_default()
+
+        match previous_data {
+            Some(data) => data
+                .split(&cfg.get_separator())
+                .skip(1)
+                .next()
+                .unwrap_or_default()
+                .into(),
+            None => "".into(),
+        }
     }
 
     /// retreive a database entry
@@ -219,7 +247,7 @@ impl Database {
     }
 
     /// revoke app access to user data
-    pub fn revoke(&self, cfg: &Arc<Config>, file_key: HashKey, app_did: &str) -> bool {
+    pub fn revoke(&self, file_key: HashKey, app_did: &str, revoke: bool) -> bool {
         // check for access permissions from the metadata
         let index = 0; // apps always take the first index
         let mut guard = self.metacache.lock().unwrap();
@@ -227,12 +255,12 @@ impl Database {
         if let Some(meta) = guard.get(&file_key) {
             // revoke the apps access
             let mut mdata = meta.clone();
-            mdata.access_bits[index] = false;
+            mdata.access_bits[index] = if revoke { false } else { true };
             guard.insert(file_key, mdata);
         }
 
         // revoke it as smart contract level
-        interface::revoke_app_access(cfg, file_key, app_did)
+        interface::revoke_app_access(file_key, app_did, revoke)
     }
 
     /// delete an entry from the database
@@ -293,7 +321,7 @@ impl Database {
     }
 
     /// get a snapshot of the database
-    pub fn snapshot(&self, cfg: &Arc<Config>) {
+    pub fn snapshot(&self) {
         println!("-----------------------------");
         let guard = self.metacache.lock().unwrap();
         println!("metacache -> {:#?}", guard);
@@ -303,10 +331,6 @@ impl Database {
 
         let guard = self.file_lookup_table.lock().unwrap();
         println!("file_lookup_table -> {:#?}", guard);
-
-        let guard = cfg.contract_storage.lock().unwrap();
-        println!("contract-state -> {:#?}", guard);
-        println!("-----------------------------");
     }
 
     /// write important file details to metadata
@@ -327,6 +351,7 @@ impl Database {
                 access_bits: [true, true],
                 modified: now,
                 ipfs_sync_timestamp: 0,
+                ipfs_sync_nonce: 0,
                 deleted_keys: Default::default(),
             };
             // save file metadata
@@ -344,7 +369,7 @@ impl Database {
             .iter_mut()
             .map(|(hk, m)| {
                 // first check the smart contract for the latest version of the file
-                let file_info = interface::get_file_info(cfg, *hk);
+                let file_info = interface::get_file_info(*hk);
                 let ipfs_cid = file_info.1;
                 let default = HashMap::<HashKey, String>::new();
                 let default_meta = Metadata::new();
@@ -374,12 +399,11 @@ impl Database {
                 // check timestamp
                 if file_info.0 != 0 {
                     // check if we have an outdated copy
-                    if file_info.0 > metadata.ipfs_sync_timestamp
+                    if file_info.0 > metadata.ipfs_sync_nonce
                         || m.modified > metadata.ipfs_sync_timestamp
                     {
                         // sync data
                         fresh_data = ipfs::sync_data(
-                            &cfg,
                             metadata,
                             &value_hashmap,
                             false,
@@ -403,6 +427,7 @@ impl Database {
                             Some(entry) => {
                                 let mut meta = (*entry).clone();
                                 meta.ipfs_sync_timestamp = now;
+                                meta.ipfs_sync_nonce = file_info.0 + 1;
                                 // clear all deleted items
                                 meta.deleted_keys = Vec::new();
 
@@ -418,7 +443,6 @@ impl Database {
                 } else {
                     // push the first copy to IPFS
                     ipfs::sync_data(
-                        &cfg,
                         metadata,
                         &value_hashmap,
                         true,
@@ -434,6 +458,7 @@ impl Database {
                         Some(entry) => {
                             let mut meta = (*entry).clone();
                             meta.ipfs_sync_timestamp = now;
+                            meta.ipfs_sync_nonce = file_info.0 + 1; // increase nonce
                             mguard.insert(*hk, meta);
                         }
                         None => {}
@@ -466,34 +491,38 @@ impl Database {
 
     /// get data from IPFS and populate database
     pub fn populate_db(&self, cfg: &Arc<Config>, did: &str) {
-        // get random 10 files related to the database from the smart contract
+        // get random 10 files related to the app from the smart contract
         // this enables fast initial lookup
-        let sc_data = interface::get_init_files(&cfg, did);
+        let sc_data = interface::get_init_files(did);
+        let mut collator: Vec<TmpData> = Vec::new();
+        // populate the vector with the necessary parsed data
+        util::parse_init_data(&sc_data, &mut collator);
 
-        // we have the CID now, so begin fetching
-        let data = ipfs::fetch_fresh_data(&sc_data);
+        // we have the CID now, so begin fetching(updating the collator internally)
+        ipfs::fetch_fresh_data(&mut collator);
         // then begin writing to data-base
-        let _ = data
+        let _ = collator
             .iter()
-            .map(|(hk, hm)| {
+            .map(|tmp| {
+                let hk = tmp.hash_key;
                 let mut guard = self.file_lookup_table.lock().unwrap();
-                let refined_data = Self::restructure_kvstore(cfg, hm);
-
+                let refined_data = Self::restructure_kvstore(cfg, &tmp.cache);
                 // now insert the data
-                guard.insert(*hk, refined_data);
-
+                guard.insert(hk, refined_data);
                 let now = get_timestamp();
 
                 // update metadata also
                 let meta = Metadata {
-                    dids: ["".to_string(), "".to_string()],
-                    access_bits: [true, true], // has to be
+                    dids: [tmp.dids[0].clone(), tmp.dids[1].clone()],
+                    access_bits: [if tmp.access_bit == -1 { false } else { true }, true],
                     modified: now,
+                    ipfs_sync_nonce: tmp.nonce,
                     ipfs_sync_timestamp: now,
                     deleted_keys: Default::default(),
                 };
+
                 let mut mguard = self.metacache.lock().unwrap();
-                mguard.insert(*hk, meta);
+                mguard.insert(hk, meta);
             })
             .collect::<()>();
     }
@@ -502,7 +531,6 @@ impl Database {
 impl Config {
     pub fn new() -> Self {
         Self {
-            contract_storage: Default::default(),
             ipfs_sync_interval: 30,                 // sync every 30 seconds
             metadata: String::new(),                // will populate this later
             separator: "*%~(@^&*$)~%*".to_string(), // complex separator
@@ -521,6 +549,7 @@ impl Metadata {
             access_bits: Default::default(),
             modified: Default::default(),
             ipfs_sync_timestamp: Default::default(),
+            ipfs_sync_nonce: Default::default(),
             deleted_keys: Default::default(),
         }
     }
@@ -673,6 +702,26 @@ impl<'a> Request<'a> {
                 Ok(Request::Revoke {
                     revoker_did,
                     app_did,
+                    revoke: true,
+                })
+            }
+            Some("UNREVOKE") => {
+                let revoker_did = parts.next().ok_or("UNREVOKE must be followed by a DID")?;
+                if !is_did(revoker_did, "user") {
+                    return Err("UNREVOKE must be followed by a Samaritans DID".into());
+                }
+
+                let app_did = parts
+                    .next()
+                    .ok_or("an app DID must be present for revocation removal")?;
+                if !is_did(app_did, "app") {
+                    return Err("an app DID must be present for revocation removal".into());
+                }
+
+                Ok(Request::Revoke {
+                    revoker_did,
+                    app_did,
+                    revoke: false,
                 })
             }
             Some("INIT") => {

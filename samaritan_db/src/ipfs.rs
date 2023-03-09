@@ -1,14 +1,13 @@
 use crate::{
     contract::interface,
-    sam_prelude::{Config, HashKey, Metadata},
+    sam_prelude::{HashKey, Metadata, TmpData},
     util,
 };
 use serde_json::{self, json, Value};
-use std::{collections::HashMap, fs, process::Command, sync::Arc};
+use std::{collections::HashMap, fs, process::Command};
 
 /// This function interfaces with IPFS and handles all operations involving IPFS
 pub fn sync_data(
-    cfg: &Arc<Config>,
     meta: &Metadata,
     db_data: &HashMap<String, String>,
     new: bool,
@@ -33,7 +32,7 @@ pub fn sync_data(
             // delete tmp file
             fs::remove_file(&file).unwrap_or_default();
             // update the state of the smart contract
-            interface::update_file_meta(&cfg, &cid, hashkey, dids, access_bits);
+            interface::update_file_meta(&cid, hashkey, dids, access_bits);
         }
     } else {
         // first pull from IPFS
@@ -80,7 +79,7 @@ pub fn sync_data(
                         // delete tmp file
                         fs::remove_file(&file).unwrap_or_default();
                         // update the state of the smart contract
-                        interface::update_file_meta(&cfg, &cid, hashkey, dids, access_bits);
+                        interface::update_file_meta(&cid, hashkey, dids, access_bits);
 
                         // return
                         return Box::new(kv_map);
@@ -93,16 +92,12 @@ pub fn sync_data(
 }
 
 /// fetch fresh IPFS data
-pub fn fetch_fresh_data(
-    sc_data: &Vec<(HashKey, String)>,
-) -> Box<Vec<(HashKey, HashMap<String, String>)>> {
-    // read data
-    let def = HashMap::<String, String>::new();
-    let collator = sc_data
-        .iter()
-        .map(|(hk, s)| {
+pub fn fetch_fresh_data(sc_data: &mut Vec<TmpData>) {
+    let _ = sc_data
+        .iter_mut()
+        .map(|tmp| {
             // get the file
-            let (success, ipfs_data) = pull_from_ipfs(s);
+            let (success, ipfs_data) = pull_from_ipfs(&tmp.cid);
             if success {
                 // parse file content and turn it into a key-value hashmap
                 let parsed_data: Value = serde_json::from_str(&ipfs_data).unwrap_or(Value::Null);
@@ -110,17 +105,12 @@ pub fn fetch_fresh_data(
                     let kv_map_result: Result<HashMap<String, String>, serde_json::Error> =
                         serde_json::from_value(parsed_data);
                     let kv_map = kv_map_result.unwrap_or_default();
-                    (hk.clone(), kv_map)
-                } else {
-                    (0u64, def.clone())
+                    // add kv_map to tmp data
+                    tmp.cache = kv_map;
                 }
-            } else {
-                (0u64, def.clone())
             }
         })
-        .filter(|hk| hk.0 != 0)
-        .collect();
-    Box::new(collator)
+        .collect::<()>();
 }
 
 /// accepts a file and pull data from IPFS into it

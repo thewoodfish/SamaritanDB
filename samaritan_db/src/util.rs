@@ -99,3 +99,33 @@ pub fn get_timestamp() -> u64 {
         .unwrap_or_default()
         .as_secs()
 }
+
+// parse initialation data
+pub fn parse_init_data(data: &str, collator: &mut Vec<TmpData>) {
+    let _ = data
+        .split("####")
+        .map(|chunk| {
+            if !chunk.is_empty() {
+                let mut s = chunk.split("##");
+                let dids = s.next().unwrap_or("--");
+                let nonce = s.next().unwrap_or("0");
+                let access_bit = s.next().unwrap_or("0");
+                let cid = s.next().unwrap_or_default().to_string();
+                let hk = s.next().unwrap_or_default().to_string();
+
+                let dids = dids.split("--").map(|d| d.to_owned()).collect();
+
+                // populate
+                let tmp = TmpData {
+                    dids,
+                    cid,
+                    nonce: nonce.parse::<u64>().unwrap_or(0),
+                    access_bit: access_bit.parse::<i32>().unwrap_or(0),
+                    hash_key: hk.parse::<HashKey>().unwrap_or(0),
+                    cache: Default::default(),
+                };
+                collator.push(tmp);
+            }
+        })
+        .collect::<()>();
+}

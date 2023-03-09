@@ -1,285 +1,184 @@
-use std::{
-    collections::HashMap,
-    time::{SystemTime, UNIX_EPOCH},
-};
+mod net {
+    use std::{collections::HashMap, process::Command};
 
-type DID = String;
-type IpfsCid = String;
-type HashKey = u64;
-type AuthContent = u64;
-type DatabaseMetadata = String;
-type AccountId = String;
+    // type DID = String;
+    type HashKey = u64;
+    type AuthContent = u64;
 
-#[derive(Default, Debug)]
-#[allow(dead_code)]
-struct FileMeta {
-    access_list: Vec<AccountId>,
-    cid: IpfsCid,
-    modified: u64,
-    db_meta: DatabaseMetadata,
-}
+    /// send nessage to contract to create account
+    pub fn create_new_account(did: &str, password: AuthContent, did_doc_cid: &str) -> bool {
+        let output = Command::new("curl")
+            .args([
+                "--header",
+                "Content-Type: application/json",
+                "--request",
+                "POST",
+                "--data",
+                &format!(r##"{{"did": "{did}", "auth_content": "{password}", "did_doc_cid": "{did_doc_cid}"}}"##),
+                "http://localhost:4000/create-new-account"
+            ])
+            .output()
+            .expect("failed to create account");
 
-#[derive(Default, Debug)]
-#[allow(dead_code)]
-struct UserInfo {
-    auth_content: AuthContent,
-    did_doc_cid: IpfsCid,
-}
-
-type Mapping<K, V> = HashMap<K, V>;
-
-#[derive(Default, Debug)]
-pub struct SamOs {
-    /// Storage for DIDs and their documents and auth material
-    auth_list: Mapping<DID, UserInfo>,
-    /// Storage for user documents metadata
-    files_meta: Mapping<HashKey, FileMeta>,
-    /// Stores the access list of a file for easy retreival
-    access_list: Mapping<DID, Mapping<HashKey, i64>>,
-}
-
-impl SamOs {
-    /// Constructor that initializes all the contract storage to default
-    #[allow(dead_code)]
-    pub fn new() -> Self {
-        SamOs {
-            auth_list: Mapping::new(),
-            files_meta: Mapping::new(),
-            access_list: Mapping::new(),
-        }
+        output.status.success()
     }
 
-    pub fn create_new_account(
-        &mut self,
-        did: DID,
-        auth_content: AuthContent,
-        did_doc_cid: IpfsCid,
-    ) {
-        let user = UserInfo {
-            auth_content,
-            did_doc_cid,
-        };
-        self.auth_list.insert(did, user);
+    /// send nessage to contract to create account
+    pub fn account_is_auth(did: &str, password: AuthContent, is_auth: bool) -> bool {
+        let output = Command::new("curl")
+            .args([
+                "--header",
+                "Content-Type: application/json",
+                "--request",
+                "POST",
+                "--data",
+                &format!(r##"{{"did": "{did}", "auth_content": "{password}", "is_auth": {is_auth}}}"##),
+                "http://localhost:4000/account-is-auth",
+            ])
+            .output()
+            .expect("failed to authenticate account");
+
+        let result = String::from_utf8_lossy(&output.stdout);
+        let bool_str = result
+            .split(":")
+            .map(|e| e.trim_end_matches('}'))
+            .skip(1)
+            .next()
+            .unwrap_or("false");
+
+        bool_str.parse::<bool>().unwrap()
     }
 
-    /// get the latest timestamp and the latest CID
-    pub fn get_file_sync_info(&self, hk: HashKey) -> (u64, String) {
-        // get entry, if any
-        match self.files_meta.get(&hk) {
-            Some(meta) => (meta.modified, meta.cid.clone()),
-            None => (0, String::new()),
-        }
+    /// get specific file info
+    pub fn get_file_info(hk: HashKey) -> (u64, String) {
+        let output = Command::new("curl")
+            .args([
+                "--header",
+                "Content-Type: application/json",
+                "--request",
+                "POST",
+                "--data",
+                &format!(r##"{{"hashkey": "{hk}"}}"##),
+                "http://localhost:4000/get-file-sync-info",
+            ])
+            .output()
+            .expect("failed to get file info");
+
+        let result = String::from_utf8_lossy(&output.stdout);
+        let response: HashMap<String, String> = serde_json::from_str(&result).unwrap_or_default();
+        let res = response.get("nonce").unwrap_or(&String::from("0")).clone();
+        let cid = response.get("cid").unwrap();
+
+        (res.parse::<u64>().unwrap(), cid.into())
     }
 
-    /// update file metadata to reflect latest changes in file accross the network
+    /// update file details
     pub fn update_file_meta(
-        &mut self,
         cid: &str,
-        hk: HashKey,
+        hashkey: HashKey,
         metadata: &str,
         dids: &[String; 2],
         access_bits: &[bool; 2],
     ) {
-        let now = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_secs();
-
-        let old_dids: Vec<String> = if dids[0] == "".to_string() {
-            // get the previous metadata to retreive the DID(s)
-            let new_meta = FileMeta::new();
-            let tmp = self.files_meta.get(&hk).unwrap_or(&new_meta);
-            tmp.access_list.clone()
-        } else {
-            dids.to_vec()
-        };
-
-        // created access list
-        let meta = FileMeta {
-            access_list: old_dids,
-            cid: cid.to_owned(),
-            modified: now,
-            db_meta: metadata.to_string(),
-        };
-        self.files_meta.insert(hk, meta);
-
-        let mut index = 0;
-        for did in dids {
-            // get the DIDs files
-            if !did.is_empty() {
-                let mut files = self.access_list.get(did).unwrap_or(&HashMap::new()).clone();
-                files.insert(
-                    hk,
-                    if !access_bits[index] {
-                        -1
-                    } else {
-                        // keep it as is or set to 0
-                        match self.access_list.get(did) {
-                            Some(entry) => match entry.get(&hk) {
-                                Some(e) => e.clone(),
-                                None => 0,
-                            },
-                            None => 0,
-                        }
-                    },
-                );
-                // 0 means infinity and there's no cap on time for now
-                index += 0;
-
-                // save
-                if files.len() > 0 {
-                    self.access_list.insert(did.to_string(), files);
-                };
-            }
-        }
+        Command::new("curl")
+            .args([
+                "--header",
+                "Content-Type: application/json",
+                "--request",
+                "POST",
+                "--data",
+                &format!(r##"{{"cid": "{cid}", "hashkey": "{hashkey}", "metadata": "{metadata}", "dids": ["{}", "{}"], "access_bits": [{}, {}]}}"##, dids[0], dids[1], access_bits[0], access_bits[1]),
+                "http://localhost:4000/update-file-meta",
+            ])
+            .output()
+            .expect("failed to update metadata");
     }
 
-    /// Return random files that a did has access to.
-    /// This helps to populate the database initially
-    pub fn get_random_files(&self, did: &str) -> Option<Vec<(HashKey, String)>> {
-        if let Some(files) = self.access_list.get(did) {
-            let collator: Vec<(HashKey, String)> = files
-                .iter()
-                .map(|(k, v)| {
-                    // get the file latest CID if allowed
-                    if *v != -1 {
-                        let cid = match self.files_meta.get(k) {
-                            Some(meta) => meta.cid.clone(),
-                            None => Default::default(),
-                        };
-                        (k.clone(), cid)
-                    } else {
-                        (k.clone(), Default::default())
-                    }
-                })
-                .filter(|(_, s)| s.len() > 0)
-                .take(50)
-                .collect();
+    // get random initial files
+    pub fn get_random_files(cid: &str) -> String {
+        let output = Command::new("curl")
+            .args([
+                "--header",
+                "Content-Type: application/json",
+                "--request",
+                "POST",
+                "--data",
+                &format!(r##"{{"cid": "{cid}"}}"##),
+                "http://localhost:4000/get-random-files",
+            ])
+            .output()
+            .expect("failed to update metadata");
 
-            Some(collator)
-        } else {
-            None
-        }
+        let result = String::from_utf8_lossy(&output.stdout);
+        let response: HashMap<String, String> = serde_json::from_str(&result).unwrap_or_default();
+        response.get("res").unwrap_or(&String::new()).into()
     }
 
-    /// Revokes app access to a users data
-    pub fn revoke_app_access(&mut self, file_key: HashKey, app_did: &str) -> bool {
-        // get app entry
-        if let Some(entry) = self.access_list.get(app_did) {
-            let mut new_entry = entry.clone();
-            match (*entry).get(&file_key) {
-                Some(_) => {
-                    // set to -1 to revoke the access and deny the app entry
-                    new_entry.insert(file_key, -1);
-                    self.access_list.insert(app_did.to_owned(), new_entry);
-                    true
-                }
-                None => false,
-            }
-        } else {
-            false
-        }
-    }
-}
+    pub fn revoke_app_access(file_key: HashKey, app_did: &str, revoke: bool) -> bool {
+        let output = Command::new("curl")
+            .args([
+                "--header",
+                "Content-Type: application/json",
+                "--request",
+                "POST",
+                "--data",
+                &format!(r##"{{"file_key": "{file_key}", "app_did": "{app_did}", "revoke": {revoke}}}"##),
+                "http://localhost:4000/revoke-app-access",
+            ])
+            .output()
+            .expect("failed to authenticate account");
 
-impl FileMeta {
-    /// Constructor that gives a new metadata
-    pub fn new() -> Self {
-        Self {
-            access_list: Default::default(),
-            cid: Default::default(),
-            modified: Default::default(),
-            db_meta: Default::default(),
-        }
+        let result = String::from_utf8_lossy(&output.stdout);
+        let bool_str = result
+            .split(":")
+            .map(|e| e.trim_end_matches('}'))
+            .skip(1)
+            .next()
+            .unwrap_or("false");
+
+        bool_str.parse::<bool>().unwrap()
     }
 }
 
 pub mod interface {
     use super::super::*;
+    use super::net;
 
-    pub fn create_new_account(did: &str, passw: &str, config: &Arc<Config>) -> bool {
+    pub fn create_new_account(did: &str, passw: &str) -> bool {
         let password = util::gen_hash(passw);
-        let did_doc_cid = "".to_string(); // we'll deal with this much later
-
-        let mut guard = config.contract_storage.lock().unwrap();
-        guard.create_new_account(did.to_owned(), password, did_doc_cid);
-
-        true
+        net::create_new_account(did, password, "")
     }
 
-    pub fn account_is_auth(did: &str, config: &Arc<Config>, passw: &str) -> bool {
-        let guard = config.contract_storage.lock().unwrap();
+    pub fn account_is_auth(did: &str, passw: &str) -> bool {
         let password = util::gen_hash(passw);
-
-        if let Some(user_info) = guard.auth_list.get(did) {
-            if password == (*user_info).auth_content {
-                return true;
-            }
-            return false;
-        } else {
-            return false;
-        }
+        net::account_is_auth(did, password, true)
     }
 
-    pub fn get_file_info(cfg: &Arc<Config>, hk: HashKey) -> (u64, String) {
-        let guard = cfg.contract_storage.lock().unwrap();
-        guard.get_file_sync_info(hk)
+    pub fn account_exists(did: &str) -> bool {
+        net::account_is_auth(did, 0, false)
+    }
+
+    pub fn get_file_info(hk: HashKey) -> (u64, String) {
+        net::get_file_info(hk)
     }
 
     /// update the file cid for the smart contract, for others to read latest image
     pub fn update_file_meta(
-        cfg: &Arc<Config>,
         cid: &str,
         hashkey: HashKey,
         dids: &[String; 2],
         access_bits: &[bool; 2],
     ) {
-        let mut guard = cfg.contract_storage.lock().unwrap();
-        guard.update_file_meta(cid, hashkey, &cfg.metadata, dids, access_bits);
+        net::update_file_meta(cid, hashkey, "", dids, access_bits);
     }
 
     /// get initial random files to populate the database quickly
-    pub fn get_init_files(cfg: &Arc<Config>, did: &str) -> Vec<(HashKey, String)> {
-        let guard = cfg.contract_storage.lock().unwrap();
-        guard.get_random_files(did).unwrap_or_default()
+    pub fn get_init_files(did: &str) -> String {
+        net::get_random_files(did)
     }
 
     /// revoke an apps access to user data
-    pub fn revoke_app_access(cfg: &Arc<Config>, file_key: HashKey, app_did: &str) -> bool {
-        // call the smart contract
-        let mut guard = cfg.contract_storage.lock().unwrap();
-        guard.revoke_app_access(file_key, app_did)
+    pub fn revoke_app_access(file_key: HashKey, app_did: &str, revoke: bool) -> bool {
+        net::revoke_app_access(file_key, app_did, revoke)
     }
 }
-
-// mod contract {
-//     use super::util;
-//     use std::process::Command;
-
-//     pub async fn create_new_account(did: &str, passw: &str) -> bool {
-//         let pw = util::blake2_hash(passw);
-//         let password = String::from_utf8(pw).unwrap_or_default();
-
-//         let output = Command::new("cargo")
-//             .args([
-//                 "contract",
-//                 "call",
-//                 "--contract",
-//                 "5ErTHUWGoxPps2CSZmTEhtpErM7SkKnf5mzeG5cb3UDCe4zQ",
-//                 "--message",
-//                 "create_new_account",
-//                 "--suri",
-//                 "//Alice",
-//                 "--args",
-//                 did,
-//                 password.as_str(),
-//                 "emptyDidDocument", /* DID Document is not handled yet */
-//             ])
-//             .current_dir("../sam_os")
-//             .output()
-//             .expect("failed to execute process");
-
-//         println!("{:?}", output);
-//         true
-//     }
-// }
