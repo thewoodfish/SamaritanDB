@@ -1,148 +1,199 @@
-mod net {
-    use std::{collections::HashMap, process::Command};
-
-    // type DID = String;
+/// the main module to call the contract
+pub mod net {
+    use super::super::util;
+    use std::process::Command;
     type HashKey = u64;
     type AuthContent = u64;
 
     /// send nessage to contract to create account
-    pub fn create_new_account(did: &str, password: AuthContent, did_doc_cid: &str) -> bool {
-        let output = Command::new("curl")
+    pub fn create_new_account(did: &str, password: AuthContent, _did_doc_cid: &str) -> bool {
+        let output = Command::new("cargo")
             .args([
-                "--header",
-                "Content-Type: application/json",
-                "--request",
-                "POST",
-                "--data",
-                &format!(r##"{{"did": "{did}", "auth_content": "{password}", "did_doc_cid": "{did_doc_cid}"}}"##),
-                "http://localhost:4000/create-new-account"
+                "contract",
+                "call",
+                "--contract",
+                "5F1dZ5MQAKRdZsVtF5Dvyqt8GEh8kXsUs1i5QvNHXYgWbp7v",
+                "--message",
+                "create_new_account",
+                "--args",
+                &util::str_to_hex(did),
+                &util::str_to_hex(&format!("{}", password)),
+                &util::str_to_hex("empty"),
+                "--suri",
+                "//Alice",
             ])
+            .current_dir("./sam_os")
             .output()
-            .expect("failed to create account");
+            .expect("failed to execute process");
 
         output.status.success()
     }
 
-    /// send nessage to contract to create account
+    /// check if an account exists or is authenticated
     pub fn account_is_auth(did: &str, password: AuthContent, is_auth: bool) -> bool {
-        let output = Command::new("curl")
+        let output = Command::new("cargo")
             .args([
-                "--header",
-                "Content-Type: application/json",
-                "--request",
-                "POST",
-                "--data",
-                &format!(r##"{{"did": "{did}", "auth_content": "{password}", "is_auth": {is_auth}}}"##),
-                "http://localhost:4000/account-is-auth",
+                "contract",
+                "call",
+                "--contract",
+                "5F1dZ5MQAKRdZsVtF5Dvyqt8GEh8kXsUs1i5QvNHXYgWbp7v",
+                "--message",
+                "create_new_account",
+                "--args",
+                &util::str_to_hex(did),
+                &util::str_to_hex(&format!("{}", password)),
+                &format!("{}", is_auth),
+                "--suri",
+                "//Alice",
+                "--dry-run",
             ])
+            .current_dir("./sam_os")
             .output()
-            .expect("failed to authenticate account");
+            .expect("failed to execute process");
 
-        let result = String::from_utf8_lossy(&output.stdout);
-        let bool_str = result
-            .split(":")
-            .map(|e| e.trim_end_matches('}'))
-            .skip(1)
-            .next()
-            .unwrap_or("false");
-
-        bool_str.parse::<bool>().unwrap()
-    }
-
-    /// get specific file info
-    pub fn get_file_info(hk: HashKey) -> (u64, String) {
-        let output = Command::new("curl")
-            .args([
-                "--header",
-                "Content-Type: application/json",
-                "--request",
-                "POST",
-                "--data",
-                &format!(r##"{{"hashkey": "{hk}"}}"##),
-                "http://localhost:4000/get-file-sync-info",
-            ])
-            .output()
-            .expect("failed to get file info");
-
-        let result = String::from_utf8_lossy(&output.stdout);
-        let response: HashMap<String, String> = serde_json::from_str(&result).unwrap_or_default();
-        let res = response.get("nonce").unwrap_or(&String::from("0")).clone();
-        let cid = response.get("cid").unwrap();
-
-        (res.parse::<u64>().unwrap(), cid.into())
+        let binding = String::from_utf8_lossy(&output.stdout);
+        util::parse_contract_boolean(&binding)
     }
 
     /// update file details
     pub fn update_file_meta(
         cid: &str,
         hashkey: HashKey,
-        metadata: &str,
+        _metadata: &str,
         dids: &[String; 2],
         access_bits: &[bool; 2],
     ) {
-        Command::new("curl")
+        let metadata = "Algorealms SamaritanDB";
+        Command::new("cargo")
             .args([
-                "--header",
-                "Content-Type: application/json",
-                "--request",
-                "POST",
-                "--data",
-                &format!(r##"{{"cid": "{cid}", "hashkey": "{hashkey}", "metadata": "{metadata}", "dids": ["{}", "{}"], "access_bits": [{}, {}]}}"##, dids[0], dids[1], access_bits[0], access_bits[1]),
-                "http://localhost:4000/update-file-meta",
+                "contract",
+                "call",
+                "--contract",
+                "5F1dZ5MQAKRdZsVtF5Dvyqt8GEh8kXsUs1i5QvNHXYgWbp7v",
+                "--message",
+                "update_file_meta",
+                "--args",
+                &util::str_to_hex(cid),
+                &util::str_to_hex(&format!("{}", hashkey)),
+                &util::str_to_hex(metadata),
+                &util::str_to_hex(&dids[0]),
+                &util::str_to_hex(if !dids[1].is_empty() {
+                    &dids[1]
+                } else {
+                    "did:sam:root:apps:xxxxxxxxxxxx"
+                }),
+                &format!("{}", access_bits[0]),
+                &format!("{}", access_bits[1]),
+                "--suri",
+                "//Alice",
             ])
+            .current_dir("./sam_os")
             .output()
-            .expect("failed to update metadata");
-    }
-
-    // get random initial files
-    pub fn get_random_files(cid: &str) -> String {
-        let output = Command::new("curl")
-            .args([
-                "--header",
-                "Content-Type: application/json",
-                "--request",
-                "POST",
-                "--data",
-                &format!(r##"{{"cid": "{cid}"}}"##),
-                "http://localhost:4000/get-random-files",
-            ])
-            .output()
-            .expect("failed to update metadata");
-
-        let result = String::from_utf8_lossy(&output.stdout);
-        let response: HashMap<String, String> = serde_json::from_str(&result).unwrap_or_default();
-        response.get("res").unwrap_or(&String::new()).into()
+            .expect("failed to execute process");
     }
 
     pub fn revoke_app_access(file_key: HashKey, app_did: &str, revoke: bool) -> bool {
-        let output = Command::new("curl")
+        let output = Command::new("cargo")
             .args([
-                "--header",
-                "Content-Type: application/json",
-                "--request",
-                "POST",
-                "--data",
-                &format!(r##"{{"file_key": "{file_key}", "app_did": "{app_did}", "revoke": {revoke}}}"##),
-                "http://localhost:4000/revoke-app-access",
+                "contract",
+                "call",
+                "--contract",
+                "5F1dZ5MQAKRdZsVtF5Dvyqt8GEh8kXsUs1i5QvNHXYgWbp7v",
+                "--message",
+                "revoke_access",
+                "--args",
+                &util::str_to_hex(app_did),
+                &util::str_to_hex(&format!("{}", file_key)),
+                &format!("{}", revoke),
+                "--suri",
+                "//Alice",
             ])
+            .current_dir("./sam_os")
             .output()
-            .expect("failed to authenticate account");
+            .expect("failed to execute process");
 
-        let result = String::from_utf8_lossy(&output.stdout);
-        let bool_str = result
-            .split(":")
-            .map(|e| e.trim_end_matches('}'))
-            .skip(1)
-            .next()
-            .unwrap_or("false");
+        output.status.success()
+    }
 
-        bool_str.parse::<bool>().unwrap()
+    pub fn get_random_files(did: &str) -> (String, String) {
+        let output = Command::new("cargo")
+            .args([
+                "contract",
+                "call",
+                "--contract",
+                "5GeKCcowiWzVdgnBgchCdreHUbsLSSCmndrxsPdwrTJGK1nH",
+                "--message",
+                "get_files_info",
+                "--args",
+                &util::str_to_hex(did),
+                "--suri",
+                "//Alice",
+                "--dry-run",
+            ])
+            .current_dir("../sam_os")
+            .output()
+            .expect("failed to execute process");
+
+        let binding = String::from_utf8_lossy(&output.stdout);
+        let basic_info = util::parse_contract_return_data(&binding);
+
+        // get extra data
+        let output = Command::new("cargo")
+            .args([
+                "contract",
+                "call",
+                "--contract",
+                "5GeKCcowiWzVdgnBgchCdreHUbsLSSCmndrxsPdwrTJGK1nH",
+                "--message",
+                "get_files_extra_info",
+                "--args",
+                &util::str_to_hex(did),
+                "--suri",
+                "//Alice",
+                "--dry-run",
+            ])
+            .current_dir("../sam_os")
+            .output()
+            .expect("failed to execute process");
+
+        let binding = String::from_utf8_lossy(&output.stdout);
+        let extra_info = util::parse_contract_tuple_vector(&binding);
+
+        (basic_info, extra_info)
+    }
+
+    /// get specific file info
+    pub fn get_file_info(hk: HashKey) -> (u64, String) {
+        let output = Command::new("cargo")
+            .args([
+                "contract",
+                "call",
+                "--contract",
+                "5Hj1xJAi1VijuWzYjkJw9rAQ1ZT4WEqLv5rxzpX8FfHmU6tW",
+                "--message",
+                "get_file_sync_info",
+                "--args",
+                &util::str_to_hex(&format!("{}", hk)),
+                "--suri",
+                "//Alice",
+                "--dry-run",
+            ])
+            .current_dir("../sam_os")
+            .output()
+            .expect("failed to execute process");
+
+        let binding = String::from_utf8_lossy(&output.stdout);
+        (
+            util::parse_first_tuple_u64(&binding),
+            util::parse_contract_return_data(&binding),
+        )
     }
 }
 
 pub mod interface {
-    use super::super::*;
-    use super::net;
+    use super::super::util;
+    use super::*;
+    use crate::sam_prelude::HashKey;
 
     pub fn create_new_account(did: &str, passw: &str) -> bool {
         let password = util::gen_hash(passw);
@@ -173,7 +224,7 @@ pub mod interface {
     }
 
     /// get initial random files to populate the database quickly
-    pub fn get_init_files(did: &str) -> String {
+    pub fn get_init_files(did: &str) -> (String, String) {
         net::get_random_files(did)
     }
 

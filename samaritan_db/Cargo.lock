@@ -2200,6 +2200,7 @@ dependencies = [
  "bytes",
  "fnv",
  "futures",
+ "hex",
  "http",
  "httparse",
  "httpdate",

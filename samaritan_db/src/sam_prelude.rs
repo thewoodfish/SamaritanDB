@@ -44,7 +44,7 @@ pub struct TmpData {
     pub dids: Vec<String>,
     pub cid: String,
     pub nonce: u64,
-    pub access_bit: i32,
+    pub access_bit: u64,
     pub hash_key: HashKey,
     pub cache: HashMap<String, String>,
 }
@@ -495,11 +495,12 @@ impl Database {
         // this enables fast initial lookup
         let sc_data = interface::get_init_files(did);
         let mut collator: Vec<TmpData> = Vec::new();
+        
         // populate the vector with the necessary parsed data
         util::parse_init_data(&sc_data, &mut collator);
-
         // we have the CID now, so begin fetching(updating the collator internally)
         ipfs::fetch_fresh_data(&mut collator);
+
         // then begin writing to data-base
         let _ = collator
             .iter()
@@ -514,7 +515,7 @@ impl Database {
                 // update metadata also
                 let meta = Metadata {
                     dids: [tmp.dids[0].clone(), tmp.dids[1].clone()],
-                    access_bits: [if tmp.access_bit == -1 { false } else { true }, true],
+                    access_bits: [if tmp.access_bit == 0 { false } else { true }, true],
                     modified: now,
                     ipfs_sync_nonce: tmp.nonce,
                     ipfs_sync_timestamp: now,

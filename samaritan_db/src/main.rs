@@ -277,12 +277,10 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
 
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
             let nkey = gen_hash(key);
-
             let previous = db.insert(config, key, hash_key, nkey, value.clone());
 
             // write file metadata
             db.write_metadata(hash_key, subject_did, object_did);
-
             Response::Triple {
                 one: key.to_string(),
                 two: value,
