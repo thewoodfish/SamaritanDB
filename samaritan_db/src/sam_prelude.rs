@@ -36,6 +36,8 @@ pub struct Config {
     pub metadata: String,
     /// Key-value in-memory separator
     separator: String,
+    /// contract address
+    contract_address: String,
 }
 
 /// This is a tempopary data structure used to hold data breifly on initialization
@@ -138,13 +140,13 @@ impl Database {
     }
 
     /// checks if an account has been intitialized already
-    pub fn account_is_auth(&self, did: &str) -> bool {
+    pub fn account_is_auth(&self, cfg: &Arc<Config>, did: &str) -> bool {
         let guard = self.auth_list.lock().unwrap();
         match guard.get(&util::gen_hash(did)) {
             Some(_) => true,
             None => {
                 // check the contract
-                if interface::account_exists(did) {
+                if interface::account_exists(cfg, did) {
                     true
                 } else {
                     false
@@ -247,7 +249,13 @@ impl Database {
     }
 
     /// revoke app access to user data
-    pub fn revoke(&self, file_key: HashKey, app_did: &str, revoke: bool) -> bool {
+    pub fn revoke(
+        &self,
+        cfg: &Arc<Config>,
+        file_key: HashKey,
+        app_did: &str,
+        revoke: bool,
+    ) -> bool {
         // check for access permissions from the metadata
         let index = 0; // apps always take the first index
         let mut guard = self.metacache.lock().unwrap();
@@ -260,7 +268,7 @@ impl Database {
         }
 
         // revoke it as smart contract level
-        interface::revoke_app_access(file_key, app_did, revoke)
+        interface::revoke_app_access(cfg, file_key, app_did, revoke)
     }
 
     /// delete an entry from the database
@@ -321,6 +329,7 @@ impl Database {
     }
 
     /// get a snapshot of the database
+    #[allow(dead_code)]
     pub fn snapshot(&self) {
         println!("-----------------------------");
         let guard = self.metacache.lock().unwrap();
@@ -369,7 +378,7 @@ impl Database {
             .iter_mut()
             .map(|(hk, m)| {
                 // first check the smart contract for the latest version of the file
-                let file_info = interface::get_file_info(*hk);
+                let file_info = interface::get_file_info(cfg, *hk);
                 let ipfs_cid = file_info.1;
                 let default = HashMap::<HashKey, String>::new();
                 let default_meta = Metadata::new();
@@ -397,13 +406,14 @@ impl Database {
                 let fresh_data: Box<HashMap<String, String>>;
 
                 // check timestamp
-                if file_info.0 != 0 {
+                if file_info.0 != 0 && ipfs_cid != "\0" {
                     // check if we have an outdated copy
                     if file_info.0 > metadata.ipfs_sync_nonce
                         || m.modified > metadata.ipfs_sync_timestamp
                     {
                         // sync data
                         fresh_data = ipfs::sync_data(
+                            cfg,
                             metadata,
                             &value_hashmap,
                             false,
@@ -438,11 +448,11 @@ impl Database {
                         }
                     } else {
                         // do nothing, we're up to date
-                        println!("reach here !!");
                     }
                 } else {
                     // push the first copy to IPFS
                     ipfs::sync_data(
+                        cfg,
                         metadata,
                         &value_hashmap,
                         true,
@@ -493,9 +503,9 @@ impl Database {
     pub fn populate_db(&self, cfg: &Arc<Config>, did: &str) {
         // get random 10 files related to the app from the smart contract
         // this enables fast initial lookup
-        let sc_data = interface::get_init_files(did);
+        let sc_data = interface::get_init_files(cfg, did);
         let mut collator: Vec<TmpData> = Vec::new();
-        
+
         // populate the vector with the necessary parsed data
         util::parse_init_data(&sc_data, &mut collator);
         // we have the CID now, so begin fetching(updating the collator internally)
@@ -514,7 +524,7 @@ impl Database {
 
                 // update metadata also
                 let meta = Metadata {
-                    dids: [tmp.dids[0].clone(), tmp.dids[1].clone()],
+                    dids: [tmp.dids[0].clone(), if tmp.dids.len() > 1 { tmp.dids[1].clone() } else { "".to_owned() } ],
                     access_bits: [if tmp.access_bit == 0 { false } else { true }, true],
                     modified: now,
                     ipfs_sync_nonce: tmp.nonce,
@@ -535,11 +545,16 @@ impl Config {
             ipfs_sync_interval: 30,                 // sync every 30 seconds
             metadata: String::new(),                // will populate this later
             separator: "*%~(@^&*$)~%*".to_string(), // complex separator
+            contract_address: "5DURtePW3WygfhGewNa76rhvqR7Un2HxFxVSitKMW4HBJRCn".to_string(),
         }
     }
 
     pub fn get_separator(&self) -> String {
         self.separator.clone()
+    }
+
+    pub fn get_contract_address(&self) -> String {
+        self.contract_address.clone()
     }
 }
 

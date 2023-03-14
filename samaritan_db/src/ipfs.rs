@@ -1,13 +1,14 @@
 use crate::{
     contract::interface,
-    sam_prelude::{HashKey, Metadata, TmpData},
+    sam_prelude::{Config, HashKey, Metadata, TmpData},
     util,
 };
 use serde_json::{self, json, Value};
-use std::{collections::HashMap, fs, process::Command};
+use std::{collections::HashMap, fs, process::Command, sync::Arc};
 
 /// This function interfaces with IPFS and handles all operations involving IPFS
 pub fn sync_data(
+    cfg: &Arc<Config>,
     meta: &Metadata,
     db_data: &HashMap<String, String>,
     new: bool,
@@ -32,7 +33,7 @@ pub fn sync_data(
             // delete tmp file
             fs::remove_file(&file).unwrap_or_default();
             // update the state of the smart contract
-            interface::update_file_meta(&cid, hashkey, dids, access_bits);
+            interface::update_file_meta(cfg, &cid, hashkey, dids, access_bits);
         }
     } else {
         // first pull from IPFS
@@ -79,7 +80,7 @@ pub fn sync_data(
                         // delete tmp file
                         fs::remove_file(&file).unwrap_or_default();
                         // update the state of the smart contract
-                        interface::update_file_meta(&cid, hashkey, dids, access_bits);
+                        interface::update_file_meta(cfg, &cid, hashkey, dids, access_bits);
 
                         // return
                         return Box::new(kv_map);

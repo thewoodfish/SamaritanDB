@@ -48,7 +48,7 @@ mod sam_os {
         /// Storage for a DID and the files its allowed to access and their permissions
         access_list: Mapping<(DID, HashKey), u64>,
         /// List of file keys a DID has access to
-        files_keys: Mapping<DID, Vec<HashKey>>,
+        file_keys: Mapping<DID, Vec<HashKey>>,
     }
 
     /// Shorten the result type
@@ -62,7 +62,7 @@ mod sam_os {
                 auth_list: Default::default(),
                 files_meta: Default::default(),
                 access_list: Default::default(),
-                files_keys: Default::default(),
+                file_keys: Default::default(),
             }
         }
 
@@ -109,7 +109,7 @@ mod sam_os {
         pub fn get_file_sync_info(&self, hk: HashKey) -> (u64, IpfsCid) {
             match self.files_meta.get(hk) {
                 Some(meta) => (meta.nonce, meta.cid),
-                None => (0, Default::default()),
+                None => (1, Default::default()),
             }
         }
 
@@ -120,9 +120,13 @@ mod sam_os {
             cid: IpfsCid,
             hk: HashKey,
             metadata: DbMetadata,
-            dids: [Vec<u8>; 2],
-            access_bits: [bool; 2],
+            did_1: DID,
+            did_2: DID,
+            access_bit_1: bool,
+            access_bit_2: bool,
         ) {
+            let access_bits = [access_bit_1, access_bit_2];
+            let dids = [did_1, did_2];
             let nonce = match self.files_meta.get(hk) {
                 Some(meta) => meta.nonce + 1,
                 None => 1,
@@ -142,99 +146,117 @@ mod sam_os {
             let mut index = 0;
             for did in dids {
                 // sometimes there can be only one DID exclusive to a file
-                if !did.is_empty() {
-                    let current_time = self.access_list.get((&did, hk));
+                if did != "did:sam:root:apps:xxxxxxxxxxxx".as_bytes().to_vec() {
+                    let current_time = self.access_list.get((did.clone(), hk));
                     match current_time {
                         Some(time) => {
-                            self.access_list
-                                .insert((did.clone(), hk), if access_bits[index] { &time } else { &0 });
+                            self.access_list.insert(
+                                (did.clone(), hk),
+                                if access_bits[index] { &time } else { &0 },
+                            );
                             // 0 -> access denied
                         }
                         None => {
                             self.access_list.insert((did.clone(), hk), &1); // 1 -> no time limit
                         }
                     }
-                }
-                index += 1;
-                // insert the filekey
-                let keys = match self.files_keys.get(&did) {
-                    Some(keys) => {
-                        if !keys.contains(&hk) {
-                            let mut new_keys = keys.clone();
-                            new_keys.push(hk);
-                            new_keys
-                        } else {
-                            keys.clone()
-                        }
-                    },
-                    None => {
-                        Vec::<HashKey>::new()
-                    }
-                };
 
-                self.files_keys.insert(did, &keys);
+                    index += 1;
+                    // insert the filekey
+                    let keys = match self.file_keys.get(did.clone()) {
+                        Some(keys) => {
+                            if !keys.contains(&hk) {
+                                let mut new_keys = keys.clone();
+                                new_keys.push(hk);
+                                new_keys
+                            } else {
+                                keys.clone()
+                            }
+                        }
+                        None => {
+                            let mut keys = Vec::<HashKey>::new();
+                            keys.push(hk);
+                            keys
+                        }
+                    };
+
+                    self.file_keys.insert(did, &keys);
+                }
             }
         }
 
-        /// get files the DID has access to
-        pub fn get_files(&self, did: DID) -> Vec<u8> {
+        /// get info about files the DID has access to
+        #[ink(message)]
+        pub fn get_files_info(&self, did: DID) -> Vec<u8> {
             let mut return_data: Vec<u8> = Vec::new();
-            match self.files_keys.get(did) {
+            match self.file_keys.get(did) {
                 Some(keys) => {
-                    let _ = keys.iter().map(|hk| {
-                        // get the corresponding file
-                        let mut collator = Vec::<u8>::new();
-                        let file = self.files_meta.get(hk).unwrap_or_default();
-                        // we need to extract a couple of things
+                    let _ = keys
+                        .iter()
+                        .map(|hk| {
+                            // get the corresponding file
+                            let mut collator = Vec::<u8>::new();
+                            let file = self.files_meta.get(hk).unwrap_or_default();
+                            let mut did_1 = file.access_list[0].clone();
+                            let mut did_2 = file.access_list[1].clone();
+                            let cid = file.cid.clone();
 
-                        // first is the access list of the file
-                        let mut did_1 = file.access_list[0].clone();
-                        let mut did_2 = file.access_list[1].clone();
-                        // get the access bits
-                        let a_bit_1 = self.access_list.get((&did_1, hk)).unwrap_or_default();
-                        let a_bit_2 = self.access_list.get((&did_2, hk)).unwrap_or_default();
-                        // cid
-                        let cid = file.cid.clone();
+                            collator.append(&mut did_1);
+                            collator.append(&mut "--".as_bytes().to_vec()); // did separator
+                            collator.append(&mut did_2);
+                            collator.append(&mut "##".as_bytes().to_vec()); // separator
 
-                        collator.append(&mut did_1);
-                        collator.append(&mut "--".as_bytes().to_vec()); // did separator
-                        collator.append(&mut did_2);
-                        collator.append(&mut "##".as_bytes().to_vec()); // separator
-                        // then the nonce follows
-                        collator.append(&mut file.nonce.to_ne_bytes().to_vec());
-                        collator.append(&mut "##".as_bytes().to_vec()); // separator
+                            // then the cid
+                            collator.append(&mut cid.to_vec());
+                            collator.append(&mut "####".as_bytes().to_vec()); // chunk separator
 
-                        // then the access bits
-                        collator.append(&mut a_bit_1.to_ne_bytes().to_vec());
-                        collator.append(&mut "--".as_bytes().to_vec()); // ab separator
-                        collator.append(&mut a_bit_2.to_ne_bytes().to_vec());
-                        collator.append(&mut "##".as_bytes().to_vec()); // separator
+                            // then append it to the return data
+                            return_data.append(&mut collator);
+                        })
+                        .collect::<()>();
+                }
+                None => {}
+            }
+            return_data
+        }
 
-                        // then the cid
-                        collator.append(&mut cid.to_vec());
-                        collator.append(&mut "##".as_bytes().to_vec()); // separator
+        /// get extra info about files the DID has access to
+        #[ink(message)]
+        pub fn get_files_extra_info(&self, did: DID) -> Vec<(u64, u64, u64)> {
+            let mut collator: Vec<(u64, u64, u64)> = Vec::new();
+            match self.file_keys.get(did) {
+                Some(keys) => {
+                    let _ = keys
+                        .iter()
+                        .map(|hk| {
+                            let tuple: (u64, u64, u64);
+                            let file = self.files_meta.get(hk).unwrap_or_default();
+                            let did_1 = file.access_list[0].clone();
 
-                        // separator
-                        collator.append(&mut hk.to_ne_bytes().to_vec());
-                        collator.append(&mut "####".as_bytes().to_vec()); // chunk separator
+                            // get the access bits and nonce
+                            let access_bit1 = self
+                                .access_list
+                                .get((did_1.clone(), hk))
+                                .unwrap_or_default();
+                            let nonce = file.nonce;
 
-                        // then append it to the return data
-                        return_data.append(&mut collator);
-
-                    }).collect::<()>();
-                },
+                            tuple = (nonce, access_bit1, *hk);
+                            collator.push(tuple);
+                        })
+                        .collect::<()>();
+                }
                 None => {}
             }
 
-            return_data
+            collator
         }
 
         /// Revokes a DIDs access to a file
         #[ink(message)]
-        pub fn revoke_access(&mut self, did: DID, hk: HashKey) {
-            self.access_list.insert((did, hk), &0);
+        pub fn revoke_access(&mut self, did: DID, hk: HashKey, revoke: bool) {
+            self.access_list
+                .insert((did, hk), if revoke { &0 } else { &1 });
         }
-
     }
 
     #[cfg(test)]
@@ -248,5 +270,5 @@ mod sam_os {
             sam.create_new_account(did, 4893290392, Vec::new()).ok();
             ink::env::debug_println!("{:#?}", sam);
         }
-    } 
+    }
 }

@@ -113,9 +113,9 @@ pub fn parse_init_data(data: &(String, String), collator: &mut Vec<TmpData>) {
                     .skip(index)
                     .next()
                     .unwrap_or_default();
+
                 if !num_str.is_empty() {
                     let mut num = num_str.split(",");
-
                     let mut s = chunk.split("##");
                     let dids = s.next().unwrap_or("--");
                     let nonce = num.next().unwrap_or("0");
@@ -123,7 +123,11 @@ pub fn parse_init_data(data: &(String, String), collator: &mut Vec<TmpData>) {
                     let cid = s.next().unwrap_or_default().to_string();
                     let hk = num.next().unwrap_or_default();
 
-                    let dids = dids.split("--").map(|d| d.to_owned()).filter(|did| did != "did:sam:root:apps:xxxxxxxxxxxx").collect();
+                    let dids = dids
+                        .split("--")
+                        .map(|d| d.to_owned())
+                        .filter(|did| did != "did:sam:root:apps:xxxxxxxxxxxx")
+                        .collect();
 
                     // populate
                     let tmp = TmpData {
@@ -137,7 +141,6 @@ pub fn parse_init_data(data: &(String, String), collator: &mut Vec<TmpData>) {
                     collator.push(tmp);
                 }
             }
-
             index += 1;
         })
         .collect::<()>();

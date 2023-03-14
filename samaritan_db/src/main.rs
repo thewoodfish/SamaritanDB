@@ -58,7 +58,6 @@ async fn main() -> Result<(), Box<dyn Error>> {
         loop {
             // sleep for some seconds
             thread::sleep(Duration::from_secs(config.ipfs_sync_interval));
-
             println!("[{}] ->  sync cycle", count);
             count += 1;
 
@@ -124,7 +123,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
         Request::New { class, password } => {
             let did = get_did(class);
             // create the new user on chain
-            if interface::create_new_account(&did, password) {
+            if interface::create_new_account(&config, &did, password) {
                 // add to database auth_list for high speed auth
                 db.add_auth_account(&did, password);
                 Response::Double {
@@ -141,7 +140,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             // check the database cache for an entry
             if !db.account_is_alive(&did, password) {
                 // check the smart contract for account entry
-                if !interface::account_is_auth(&did, password) {
+                if !interface::account_is_auth(&config, &did, password) {
                     return Response::Error {
                         msg: format!(
                             "account with did:'{}' and password:'{}' not recognized",
@@ -164,13 +163,13 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             revoke,
         } => {
             // check for auth
-            if !db.account_is_auth(&revoker_did) {
+            if !db.account_is_auth(&config, &revoker_did) {
                 return Response::Error {
                     msg: format!("account with did:'{}' not recognized", revoker_did),
                 };
             }
 
-            if !db.account_is_auth(&app_did) {
+            if !db.account_is_auth(&config, &app_did) {
                 return Response::Error {
                     msg: format!("account with did:'{}' not recognized", app_did),
                 };
@@ -178,7 +177,7 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
 
             // calculate hashkey
             let hash_key: HashKey = get_hashkey(app_did, revoker_did);
-            if db.revoke(hash_key, app_did, revoke) {
+            if db.revoke(&config, hash_key, app_did, revoke) {
                 Response::Single(app_did.to_owned())
             } else {
                 Response::Error {
@@ -192,14 +191,14 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             object_did,
         } => {
             // check for auth
-            if !db.account_is_auth(&subject_did) {
+            if !db.account_is_auth(&config, &subject_did) {
                 return Response::Error {
                     msg: format!("account with did:'{}' not recognized", subject_did),
                 };
             }
 
             if object_did != "" {
-                if !db.account_is_auth(&object_did) {
+                if !db.account_is_auth(&config, &object_did) {
                     return Response::Error {
                         msg: format!("account with did:'{}' not recognized", object_did),
                     };
@@ -226,14 +225,14 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             object_did,
         } => {
             // check for auth
-            if !db.account_is_auth(&subject_did) {
+            if !db.account_is_auth(&config, &subject_did) {
                 return Response::Error {
                     msg: format!("account with did:'{}' not recognized", subject_did),
                 };
             }
 
             if object_did != "" {
-                if !db.account_is_auth(&object_did) {
+                if !db.account_is_auth(&config, &object_did) {
                     return Response::Error {
                         msg: format!("account with did:'{}' not recognized", object_did),
                     };
@@ -261,14 +260,14 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             object_did,
         } => {
             // check for auth
-            if !db.account_is_auth(&subject_did) {
+            if !db.account_is_auth(&config, &subject_did) {
                 return Response::Error {
                     msg: format!("account with did:'{}' not recognized", subject_did),
                 };
             }
 
             if object_did != "" {
-                if !db.account_is_auth(&object_did) {
+                if !db.account_is_auth(&config, &object_did) {
                     return Response::Error {
                         msg: format!("account with did:'{}' not recognized", object_did),
                     };
