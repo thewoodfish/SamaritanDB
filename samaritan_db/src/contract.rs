@@ -26,15 +26,13 @@ pub mod net {
                 &format!("{}", password),
                 &util::str_to_hex("empty"),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
             ])
             .current_dir("./sam_os")
             .output()
             .expect("failed to execute process");
-
-        println!("{:#?}", output);
 
         output.status.success()
     }
@@ -59,7 +57,7 @@ pub mod net {
                 &format!("{}", password),
                 &format!("{}", is_auth),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
                 "--dry-run",
@@ -67,8 +65,6 @@ pub mod net {
             .current_dir("./sam_os")
             .output()
             .expect("failed to execute process");
-
-        println!("{:#?}", output);
 
         let binding = String::from_utf8_lossy(&output.stdout);
         util::parse_contract_boolean(&binding)
@@ -84,7 +80,7 @@ pub mod net {
         access_bits: &[bool; 2],
     ) {
         let metadata = "Algorealms SamaritanDB";
-        let output = Command::new("cargo")
+        Command::new("cargo")
             .args([
                 "contract",
                 "call",
@@ -105,15 +101,13 @@ pub mod net {
                 &format!("{}", access_bits[0]),
                 &format!("{}", access_bits[1]),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
             ])
             .current_dir("./sam_os")
             .output()
             .expect("failed to execute process");
-
-        println!("{:#?}", output);
     }
 
     pub fn revoke_app_access(
@@ -135,15 +129,13 @@ pub mod net {
                 &format!("{}", file_key),
                 &format!("{}", revoke),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
             ])
             .current_dir("./sam_os")
             .output()
             .expect("failed to execute process");
-
-        println!("{:#?}", output);
         output.status.success()
     }
 
@@ -159,7 +151,7 @@ pub mod net {
                 "--args",
                 &util::str_to_hex(did),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
                 "--dry-run",
@@ -183,7 +175,7 @@ pub mod net {
                 "--args",
                 &util::str_to_hex(did),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
                 "--dry-run",
@@ -211,7 +203,7 @@ pub mod net {
                 "--args",
                 &format!("{}", hk),
                 "--suri",
-                "blast they annual column pave umbrella again olympic exotic vibrant lemon visa",
+                &cfg.get_contract_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
                 "--dry-run",
@@ -219,8 +211,6 @@ pub mod net {
             .current_dir("./sam_os")
             .output()
             .expect("failed to execute process");
-
-        println!("{:#?}", output);
 
         let binding = String::from_utf8_lossy(&output.stdout);
         (

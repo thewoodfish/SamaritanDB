@@ -38,6 +38,8 @@ pub struct Config {
     separator: String,
     /// contract address
     contract_address: String,
+    /// contract keys
+    contract_keys: String
 }
 
 /// This is a tempopary data structure used to hold data breifly on initialization
@@ -542,10 +544,11 @@ impl Database {
 impl Config {
     pub fn new() -> Self {
         Self {
-            ipfs_sync_interval: 30,                 // sync every 30 seconds
+            ipfs_sync_interval: 10,                 // sync every 30 seconds
             metadata: String::new(),                // will populate this later
             separator: "*%~(@^&*$)~%*".to_string(), // complex separator
-            contract_address: "5DURtePW3WygfhGewNa76rhvqR7Un2HxFxVSitKMW4HBJRCn".to_string(),
+            contract_address: "5CEjm1AHRrjJ4ztJnVAU3ksH3odbDZdjxvZDjNtys5zK5M6j".to_string(),
+            contract_keys: "blast they annual column pave umbrella again olympic exotic vibrant lemon visa".to_string()
         }
     }
 
@@ -555,6 +558,10 @@ impl Config {
 
     pub fn get_contract_address(&self) -> String {
         self.contract_address.clone()
+    }
+
+    pub fn get_contract_keys(&self) -> String {
+        self.contract_keys.clone()
     }
 }
 
