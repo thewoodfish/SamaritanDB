@@ -17,10 +17,10 @@ use std::time::Duration;
 use std::{env, thread};
 use util::*;
 
-mod contract;
+mod contract; 
 mod ipfs;
 
-#[tokio::main]
+#[tokio::main] 
 async fn main() -> Result<(), Box<dyn Error>> {
     // Parse the address we're going to run this server on
     // and set up our TCP listener to accept connections.
