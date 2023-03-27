@@ -580,7 +580,7 @@ impl Metadata {
 
 impl<'a> Request<'a> {
     pub fn parse(input: &'a str) -> Result<Request<'a>, String> {
-        let mut parts = input.split("~~");
+        let mut parts = input.split("::");
         match parts.next() {
             Some("GET") => {
                 let subject_did = match parts.next() {
