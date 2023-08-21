@@ -1,2 +1,3 @@
 # samaritanDB (Key-Value Database)
-A decentralised and distributed key-value store.
+
+Assuming you've read the <a href="https://algorealm.gitbook.io/samaritanos-a-d-system-for-digital-identity">SamaritanOS wiki</a>, you know why we are working on SamaritanDB and why it is important. 
