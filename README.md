@@ -5,7 +5,7 @@ Assuming you've read the [SamaritanOS wiki](https://algorealm.gitbook.io/samarit
 SamaritanDB (KVD) is a decentralised and distributed key-value database which plays a great role in bringing our vision for the internet to fruition.
 <br>
 ## Prototype
-In our bid to break through assumptions and barriers, we have build a prototype that works - version 1.0 (Chevalier). This prototype makes application store data in a way that leaves control to the user and is free of every centralised storage provider. It is distributed and decentralized. The prototype is also fastly changing as ideas and thinking are being refined and reshaped to create the most effective and efficient product. We will not decieve ouselves.
+In our bid to break through assumptions and barriers, we have build a prototype that works - version 1.0 (Chevalier). This prototype makes applications store data in a way that leaves control to the user and is free of every centralised storage provider. It is distributed and decentralized. The prototype is also fastly changing as ideas and thinking are being refined and reshaped to create the most effective and efficient product. We will not decieve ourselves.
 <br>
 ## Testing the prototype
 You can download the prototype from the page for your suitable devices and configure (nothing to do really) and run them immediately to test the database network.
