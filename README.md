@@ -8,7 +8,7 @@ SamaritanDB (KVD) is an in-memory decentralised and distributed key-value databa
 In our bid to break through assumptions and barriers, we have build a prototype that works - version 1.0 (Chevalier). This prototype makes applications store data in a way that leaves control to the user and is free of every centralised storage provider. It is distributed and decentralized. The prototype is also fastly changing as ideas and thinking are being refined and reshaped to create the most effective and efficient product. We will not decieve ourselves.
 <br>
 ## Testing the prototype
-You can download the prototype from the page for your suitable devices and configure (nothing to do really) and run them immediately to test the database network.
+You can download the prototype from the page for your suitable devices and configure (a breeze) and run them immediately to test the database network.
 ## Stack
 - The database is written in Rust.
 - It is built with libp2p as its major networking stack.
@@ -30,8 +30,3 @@ You can download the prototype from the page for your suitable devices and confi
 - `leave <application_DID>` - This command stops the database node from participating in any operation concerning an application, network operations especially. It frees itself of all the applications data.
 - `config <application_DID> <flag> <param>` - This command makes configuration changes to the database per application e.g configuring the pinning server URL where subsequent IPFS writes would be POSTed.
 - `access <application_DID> <samaritan_DID> <allow|deny>` - This command changes the data access settings of an application in relation to a user.
-
-## Setting Up
-
-
-
