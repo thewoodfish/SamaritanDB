@@ -28,6 +28,10 @@ You can download the prototype from the page for your suitable devices and confi
 - `truncate <application_DID> [samaritan_DID]` - This commands deletes the entire data entries of a user or an application.
 - `info` - This command provides basic information about the database node and its network state.
 - `leave <application_DID>` - This command stops the database node from participating in any operation concerning an application, network operations especially. It frees itself of all the applications data.
-- 
-- 
+- `config <application_DID> <flag> <param>` - This command makes configuration changes to the database per application e.g configuring the pinning server URL where subsequent IPFS writes would be POSTed.
+- `access <application_DID> <samaritan_DID> <allow|deny>` - This command changes the data access settings of an application in relation to a user.
+
+## Setting Up
+
+
 
