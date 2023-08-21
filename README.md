@@ -15,4 +15,9 @@ You can download the prototype from the page for your suitable devices and confi
 - It interacts very often with IPFS
 - It also interacts periodically with the [SamaritanOS contract](https://github.com/algorealmInc/samaritanos-contract).
 ## Prequisites
+- You must have IPFS installed on your machine.
+- You must be open-minded.
+## Commands 
+- `new <app|user> <Password>` - This command creates a new identity, whether for an application or a user on the internet and assigns it a DID and private keys.
+- `init <application_DID> <Password>` - This command initialized an application on the particular node that runs the database. This means the node begins to care and participate in maintaining, storing and supplying the application data in the network.
 
