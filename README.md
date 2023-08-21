@@ -2,7 +2,7 @@
 
 Assuming you've read the [SamaritanOS wiki](https://algorealm.gitbook.io/samaritanos-a-d-system-for-digital-identity), you know why we are working on SamaritanDB and why it is important. 
 <br>
-SamaritanDB (KVD) is an in-memory decentralised and distributed key-value database which plays a great role in bringing our vision for the internet to fruition.
+SamaritanDB (KVD) is an in-memory decentralised and distributed key-value database which plays a great role in bringing our vision for the internet to reality.
 <br>
 ## Prototype
 In our bid to break through assumptions and barriers, we have build a prototype that works - version 1.0 (Chevalier). This prototype makes applications store data in a way that leaves control to the user and is free of every centralised storage provider. It is distributed and decentralized. The prototype is also fastly changing as ideas and thinking are being refined and reshaped to create the most effective and efficient product. We will not decieve ourselves.
