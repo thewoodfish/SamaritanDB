@@ -16,6 +16,7 @@ You can download the prototype from the page for your suitable devices and confi
 - It also interacts periodically with the [SamaritanOS contract](https://github.com/algorealmInc/samaritanos-contract).
 ## Prequisites
 - You must have IPFS installed on your machine.
+- You must have `cargo-contract` installed. [Here](https://github.com/paritytech/cargo-contract#installation)
 - You must be open-minded.
 ## Commands 
 - `new <app|user> <Password>` - This command creates a new identity, whether for an application or a user on the internet and assigns it a DID and private keys.
