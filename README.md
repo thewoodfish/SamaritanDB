@@ -1,4 +1,3 @@
-# SamaritanDB: Your data, Your rules
+# SamaritanDB: Your Data, Your Rules
 
-SamaritanDB is a decentralized data store that empowers users to keep control and soverignty of the data stored about them by applications and services they interact with across the internet. 
-Please visit [link]our wiki to find out what it is and why it is important.
+SamaritanDB is a decentralized data store that empowers users to maintain control and sovereignty over the data stored about them by the applications and services they interact with on the internet. To learn more about what SamaritanDB is and why it holds significance, please visit [our wiki](link).
