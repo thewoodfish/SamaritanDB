@@ -1,4 +1,4 @@
-# SamaritanDB (Key-Value Database)
+# SamaritanDB: Your data, Your rules
 
 Assuming you've read the [SamaritanOS wiki](https://algorealm.gitbook.io/samaritanos-a-d-system-for-digital-identity), you know why we are working on SamaritanDB and why it is important. 
 <br>
