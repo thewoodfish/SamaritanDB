@@ -1,0 +1,420 @@
+12:35:43 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+12:35:43 [INFO] Transport layer configured
+12:35:43 [INFO] Gossipsub network layer configured
+12:35:43 [INFO] Node identity configured
+12:35:43 [INFO] Network driver configured
+12:35:43 [INFO] 1 peer(s) fetched from contract
+12:35:43 [INFO] Database is online
+12:35:44 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+12:35:44 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+12:35:44 [INFO] Database server listening on 0.0.0.0:2027
+12:35:44 [INFO] starting 8 workers
+12:35:44 [INFO] Actix runtime found; starting in Actix runtime
+12:35:44 [INFO] 1 peer(s) fetched from contract
+12:36:43 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+12:36:43 [INFO] 97 bytes written to IPFS with CID: QmTSMGofQsR6fdYVSbbnGdYZa7CaCb7XMPcpQ7wLdiZVxh
+12:36:43 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+12:36:43 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:36:43 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:36:43 [INFO] ~ performing IPFS and contract update
+12:36:43 [INFO] updating IPFS and contract data
+12:36:53 [INFO] ~ performing IPFS and contract update
+12:36:53 [INFO] updating IPFS and contract data
+12:37:03 [INFO] ~ performing IPFS and contract update
+12:37:03 [INFO] updating IPFS and contract data
+12:37:13 [INFO] ~ performing IPFS and contract update
+12:37:13 [INFO] updating IPFS and contract data
+12:37:24 [INFO] ~ performing IPFS and contract update
+12:37:24 [INFO] updating IPFS and contract data
+12:37:34 [INFO] ~ performing IPFS and contract update
+12:37:34 [INFO] updating IPFS and contract data
+12:37:44 [INFO] ~ performing IPFS and contract update
+12:37:44 [INFO] updating IPFS and contract data
+12:37:54 [INFO] ~ performing IPFS and contract update
+12:37:54 [INFO] updating IPFS and contract data
+12:38:04 [INFO] ~ performing IPFS and contract update
+12:38:04 [INFO] updating IPFS and contract data
+12:38:14 [INFO] ~ performing IPFS and contract update
+12:38:14 [INFO] updating IPFS and contract data
+12:38:24 [INFO] ~ performing IPFS and contract update
+12:38:24 [INFO] updating IPFS and contract data
+12:38:34 [INFO] ~ performing IPFS and contract update
+12:38:34 [INFO] updating IPFS and contract data
+12:38:44 [INFO] ~ performing IPFS and contract update
+12:38:44 [INFO] updating IPFS and contract data
+12:38:54 [INFO] ~ performing IPFS and contract update
+12:38:54 [INFO] updating IPFS and contract data
+12:39:04 [INFO] ~ performing IPFS and contract update
+12:39:04 [INFO] updating IPFS and contract data
+12:39:14 [INFO] ~ performing IPFS and contract update
+12:39:14 [INFO] updating IPFS and contract data
+12:39:25 [INFO] ~ performing IPFS and contract update
+12:39:25 [INFO] updating IPFS and contract data
+12:39:35 [INFO] ~ performing IPFS and contract update
+12:39:35 [INFO] updating IPFS and contract data
+12:39:43 [INFO] ~ acquired responsibility for network's data update
+12:39:45 [INFO] ~ performing IPFS and contract update
+12:39:45 [INFO] updating IPFS and contract data
+12:39:55 [INFO] ~ performing IPFS and contract update
+12:39:55 [INFO] updating IPFS and contract data
+12:40:05 [INFO] ~ performing IPFS and contract update
+12:40:05 [INFO] updating IPFS and contract data
+12:40:15 [INFO] ~ performing IPFS and contract update
+12:40:15 [INFO] updating IPFS and contract data
+12:40:25 [INFO] ~ performing IPFS and contract update
+12:40:25 [INFO] updating IPFS and contract data
+12:40:35 [INFO] ~ performing IPFS and contract update
+12:40:35 [INFO] updating IPFS and contract data
+12:40:44 [INFO] 1 peer(s) fetched from contract
+12:40:45 [INFO] ~ performing IPFS and contract update
+12:40:45 [INFO] updating IPFS and contract data
+12:40:55 [INFO] ~ performing IPFS and contract update
+12:40:55 [INFO] updating IPFS and contract data
+12:41:05 [INFO] ~ performing IPFS and contract update
+12:41:05 [INFO] updating IPFS and contract data
+12:41:15 [INFO] ~ performing IPFS and contract update
+12:41:15 [INFO] updating IPFS and contract data
+12:41:26 [INFO] ~ performing IPFS and contract update
+12:41:26 [INFO] updating IPFS and contract data
+12:42:03 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+12:42:03 [INFO] Transport layer configured
+12:42:03 [INFO] Gossipsub network layer configured
+12:42:03 [INFO] Node identity configured
+12:42:03 [INFO] Network driver configured
+12:42:03 [INFO] 1 peer(s) fetched from contract
+12:42:03 [INFO] Database is online
+12:42:03 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+12:42:03 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+12:42:03 [INFO] Database server listening on 0.0.0.0:2027
+12:42:03 [INFO] starting 8 workers
+12:42:03 [INFO] Actix runtime found; starting in Actix runtime
+12:42:03 [INFO] 1 peer(s) fetched from contract
+12:42:06 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+12:42:06 [INFO] 97 bytes written to IPFS with CID: QmfYGF3BXa8SYkEx73Tu35mkLTMew8zCQ2iFMDkKcpLd8R
+12:42:06 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+12:42:06 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:42:06 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:42:07 [INFO] ~ performing IPFS and contract update
+12:42:07 [INFO] updating IPFS and contract data
+12:42:17 [INFO] ~ performing IPFS and contract update
+12:42:17 [INFO] updating IPFS and contract data
+12:42:27 [INFO] ~ performing IPFS and contract update
+12:42:27 [INFO] updating IPFS and contract data
+12:42:37 [INFO] ~ performing IPFS and contract update
+12:42:37 [INFO] updating IPFS and contract data
+12:42:47 [INFO] ~ performing IPFS and contract update
+12:42:47 [INFO] updating IPFS and contract data
+12:42:57 [INFO] ~ performing IPFS and contract update
+12:42:57 [INFO] updating IPFS and contract data
+12:43:07 [INFO] ~ performing IPFS and contract update
+12:43:07 [INFO] updating IPFS and contract data
+12:43:17 [INFO] ~ performing IPFS and contract update
+12:43:17 [INFO] updating IPFS and contract data
+12:43:27 [INFO] ~ performing IPFS and contract update
+12:43:27 [INFO] updating IPFS and contract data
+12:43:37 [INFO] ~ performing IPFS and contract update
+12:43:37 [INFO] updating IPFS and contract data
+12:43:47 [INFO] ~ performing IPFS and contract update
+12:43:47 [INFO] updating IPFS and contract data
+12:43:58 [INFO] ~ performing IPFS and contract update
+12:43:58 [INFO] updating IPFS and contract data
+12:44:08 [INFO] ~ performing IPFS and contract update
+12:44:08 [INFO] updating IPFS and contract data
+12:44:18 [INFO] ~ performing IPFS and contract update
+12:44:18 [INFO] updating IPFS and contract data
+12:44:28 [INFO] ~ performing IPFS and contract update
+12:44:28 [INFO] updating IPFS and contract data
+12:44:38 [INFO] ~ performing IPFS and contract update
+12:44:38 [INFO] updating IPFS and contract data
+12:44:48 [INFO] ~ performing IPFS and contract update
+12:44:48 [INFO] updating IPFS and contract data
+12:44:58 [INFO] ~ performing IPFS and contract update
+12:44:58 [INFO] updating IPFS and contract data
+12:45:06 [INFO] ~ acquired responsibility for network's data update
+12:45:08 [INFO] ~ performing IPFS and contract update
+12:45:08 [INFO] updating IPFS and contract data
+12:45:18 [INFO] ~ performing IPFS and contract update
+12:45:18 [INFO] updating IPFS and contract data
+12:45:28 [INFO] ~ performing IPFS and contract update
+12:45:28 [INFO] updating IPFS and contract data
+12:45:38 [INFO] ~ performing IPFS and contract update
+12:45:38 [INFO] updating IPFS and contract data
+12:45:49 [INFO] ~ performing IPFS and contract update
+12:45:49 [INFO] updating IPFS and contract data
+12:45:59 [INFO] ~ performing IPFS and contract update
+12:45:59 [INFO] updating IPFS and contract data
+12:46:09 [INFO] ~ performing IPFS and contract update
+12:46:09 [INFO] updating IPFS and contract data
+12:46:19 [INFO] ~ performing IPFS and contract update
+12:46:19 [INFO] updating IPFS and contract data
+12:46:29 [INFO] ~ performing IPFS and contract update
+12:46:29 [INFO] updating IPFS and contract data
+12:46:45 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+12:46:45 [INFO] Transport layer configured
+12:46:45 [INFO] Gossipsub network layer configured
+12:46:45 [INFO] Node identity configured
+12:46:45 [INFO] Network driver configured
+12:46:45 [INFO] 1 peer(s) fetched from contract
+12:46:45 [INFO] Database is online
+12:46:45 [INFO] Database server listening on 0.0.0.0:2027
+12:46:45 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+12:46:45 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+12:46:45 [INFO] starting 8 workers
+12:46:45 [INFO] Actix runtime found; starting in Actix runtime
+12:46:45 [INFO] 1 peer(s) fetched from contract
+12:47:53 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+12:47:53 [INFO] 97 bytes written to IPFS with CID: QmdymZTX3WfjEhp1GBEhtQKFQrr1GsrtXzcm2Vh132NUB7
+12:47:53 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+12:47:53 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:47:53 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:47:53 [INFO] ~ performing IPFS and contract update
+12:47:53 [INFO] updating IPFS and contract data
+12:51:41 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+12:51:41 [INFO] Transport layer configured
+12:51:41 [INFO] Gossipsub network layer configured
+12:51:41 [INFO] Node identity configured
+12:51:41 [INFO] Network driver configured
+12:51:41 [INFO] 1 peer(s) fetched from contract
+12:51:41 [INFO] Database is online
+12:51:41 [INFO] Database server listening on 0.0.0.0:2027
+12:51:41 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+12:51:41 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+12:51:41 [INFO] starting 8 workers
+12:51:41 [INFO] Actix runtime found; starting in Actix runtime
+12:51:42 [INFO] 1 peer(s) fetched from contract
+12:51:51 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+12:51:51 [INFO] 97 bytes written to IPFS with CID: QmbqrPoMUcqWj35xDSBMXn2xQsji6qTiZtsHSjHvZEcJpU
+12:51:51 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+12:51:51 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:51:51 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:51:51 [INFO] ~ performing IPFS and contract update
+12:51:51 [INFO] updating IPFS and contract data
+12:52:01 [INFO] ~ performing IPFS and contract update
+12:52:01 [INFO] updating IPFS and contract data
+12:52:11 [INFO] ~ performing IPFS and contract update
+12:52:11 [INFO] updating IPFS and contract data
+12:56:15 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+12:56:15 [INFO] Transport layer configured
+12:56:15 [INFO] Gossipsub network layer configured
+12:56:15 [INFO] Node identity configured
+12:56:15 [INFO] Network driver configured
+12:56:19 [INFO] 1 peer(s) fetched from contract
+12:56:19 [INFO] Database is online
+12:56:19 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+12:56:19 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+12:56:19 [INFO] Database server listening on 0.0.0.0:2027
+12:56:19 [INFO] starting 8 workers
+12:56:19 [INFO] Actix runtime found; starting in Actix runtime
+12:56:24 [INFO] 1 peer(s) fetched from contract
+12:56:30 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+12:57:39 [INFO] 97 bytes written to IPFS with CID: QmXk5N7w9RgGiruZZXxFWh428PKBZ5FuvdL5VsopJwgxFu
+12:58:33 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+12:58:33 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:58:33 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+12:59:03 [INFO] ~ performing IPFS and contract update
+12:59:03 [INFO] updating IPFS and contract data
+12:59:56 [INFO] ~ performing IPFS and contract update
+12:59:56 [INFO] updating IPFS and contract data
+13:00:09 [INFO] ~ performing IPFS and contract update
+13:00:09 [INFO] updating IPFS and contract data
+13:00:23 [INFO] ~ performing IPFS and contract update
+13:00:23 [INFO] updating IPFS and contract data
+13:00:40 [INFO] ~ performing IPFS and contract update
+13:00:40 [INFO] updating IPFS and contract data
+13:00:55 [INFO] ~ performing IPFS and contract update
+13:00:55 [INFO] updating IPFS and contract data
+13:01:09 [INFO] ~ performing IPFS and contract update
+13:01:09 [INFO] updating IPFS and contract data
+13:01:12 [INFO] Database server operation complete -> get()
+13:01:12 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.000657
+13:01:12 [INFO] Database server operation complete -> insert()
+13:01:12 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.000633
+13:01:12 [INFO] Database server operation complete -> get()
+13:01:12 [INFO] Database server operation complete -> get()
+13:01:12 [INFO] Database server operation complete -> get()
+13:01:12 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.000523
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [INFO] Database server operation complete -> insert()
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [INFO] Database server operation complete -> insert()
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [INFO] Database server operation complete -> insert()
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [INFO] Database server operation complete -> insert()
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [INFO] Database server operation complete -> insert()
+13:01:12 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.029115
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:22 [INFO] ~ performing IPFS and contract update
+13:01:22 [INFO] updating IPFS and contract data
+13:01:22 [INFO] 138 bytes written to IPFS with CID: QmVkViFrMRBSJP1c8GEbyvXqtH6xYiijewLb51ZDJZZmvP
+13:01:22 [INFO] Successfully pinned CID (QmVkViFrMRBSJP1c8GEbyvXqtH6xYiijewLb51ZDJZZmvP) on local node
+13:01:22 [INFO] 322 bytes written to IPFS with CID: QmaYkc28QZxJYeAvgttgAD3W1mo5eZbNq2YuyUQ2vYYv2C
+13:01:22 [INFO] Successfully pinned CID (QmaYkc28QZxJYeAvgttgAD3W1mo5eZbNq2YuyUQ2vYYv2C) on local node
+13:01:23 [INFO] 287 bytes written to IPFS with CID: QmaS3iCnw9Ur2qqpfZhk4JGqgK4CePEz8csK8A39Mz6HnE
+13:01:28 [INFO] Database server operation complete -> get()
+13:01:28 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 75 "-" "axios/1.5.0" 0.001865
+13:01:33 [INFO] ~ acquired responsibility for network's data update
+13:01:46 [INFO] network data update successful - cid: QmaS3iCnw9Ur2qqpfZhk4JGqgK4CePEz8csK8A39Mz6HnE, did: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+13:01:46 [INFO] Successfully pinned CID (QmaS3iCnw9Ur2qqpfZhk4JGqgK4CePEz8csK8A39Mz6HnE) on local node
+13:01:46 [INFO] Database server operation complete -> get()
+13:01:46 [INFO] Database server operation complete -> insert()
+13:01:46 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 75 "-" "axios/1.5.0" 6.815481
+13:01:46 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 18.205791
+13:01:46 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:46 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:46 [INFO] Database server operation complete -> insert()
+13:01:46 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.015877
+13:01:46 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:46 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:49 [INFO] Database server operation complete -> get()
+13:01:49 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 75 "-" "axios/1.5.0" 0.000697
+13:01:49 [INFO] Database server operation complete -> insert()
+13:01:49 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.000927
+13:01:49 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:49 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:49 [INFO] 1 peer(s) fetched from contract
+13:01:59 [INFO] Database server operation complete -> get()
+13:01:59 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 75 "-" "axios/1.5.0" 0.001054
+13:01:59 [INFO] Database server operation complete -> insert()
+13:01:59 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001688
+13:01:59 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:01:59 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:02:08 [INFO] Database server operation complete -> get()
+13:02:08 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 74 "-" "axios/1.5.0" 0.001599
+13:02:08 [INFO] Database server operation complete -> insert()
+13:02:08 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001071
+13:02:08 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:02:08 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:02:24 [INFO] Database server operation complete -> get()
+13:02:24 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 74 "-" "axios/1.5.0" 0.000930
+13:02:24 [INFO] Database server operation complete -> insert()
+13:02:24 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001660
+13:02:24 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:02:24 [ERROR] Failed to publish message to peers: `did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn`
+13:02:24 [INFO] ~ performing IPFS and contract update
+13:02:24 [INFO] updating IPFS and contract data
+13:02:24 [INFO] 138 bytes written to IPFS with CID: QmVkViFrMRBSJP1c8GEbyvXqtH6xYiijewLb51ZDJZZmvP
+13:02:24 [INFO] Successfully pinned CID (QmVkViFrMRBSJP1c8GEbyvXqtH6xYiijewLb51ZDJZZmvP) on local node
+13:02:24 [INFO] 322 bytes written to IPFS with CID: QmW7c7inJMTB5Z2hjjM4WEo4zW2i32UPAskT7M7evDnkfi
+13:02:24 [INFO] Successfully pinned CID (QmW7c7inJMTB5Z2hjjM4WEo4zW2i32UPAskT7M7evDnkfi) on local node
+13:02:25 [INFO] 287 bytes written to IPFS with CID: QmbGYt4kwL11nPWS35oekeXN2DMFLEwHBeApCefMWF93Hi
+13:02:32 [INFO] Database server operation complete -> get()
+13:02:32 [INFO] Database server operation complete -> get()
+13:02:32 [INFO] Database server operation complete -> get()
+13:02:32 [INFO] Database server operation complete -> get()
+13:02:32 [INFO] Database server operation complete -> get()
+13:02:32 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 156 "-" "axios/1.5.0" 0.003367
+13:03:01 [INFO] network data update successful - cid: QmbGYt4kwL11nPWS35oekeXN2DMFLEwHBeApCefMWF93Hi, did: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+13:03:01 [INFO] Successfully pinned CID (QmbGYt4kwL11nPWS35oekeXN2DMFLEwHBeApCefMWF93Hi) on local node
+13:03:28 [INFO] ~ performing IPFS and contract update
+13:03:28 [INFO] updating IPFS and contract data
+13:03:44 [INFO] ~ performing IPFS and contract update
+13:03:44 [INFO] updating IPFS and contract data
+13:04:01 [INFO] ~ performing IPFS and contract update
+13:04:01 [INFO] updating IPFS and contract data
+13:04:35 [INFO] ~ performing IPFS and contract update
+13:04:35 [INFO] updating IPFS and contract data
+13:05:15 [INFO] ~ performing IPFS and contract update
+13:05:15 [INFO] updating IPFS and contract data
+13:05:30 [INFO] ~ performing IPFS and contract update
+13:05:30 [INFO] updating IPFS and contract data
+13:05:53 [INFO] ~ performing IPFS and contract update
+13:05:53 [INFO] updating IPFS and contract data
+13:06:06 [INFO] ~ performing IPFS and contract update
+13:06:06 [INFO] updating IPFS and contract data
+13:06:15 [INFO] Database server operation complete -> get()
+13:06:15 [INFO] Database server operation complete -> get()
+13:06:15 [INFO] Database server operation complete -> get()
+13:06:15 [INFO] Database server operation complete -> get()
+13:06:15 [INFO] Database server operation complete -> get()
+13:06:15 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 156 "-" "axios/1.5.0" 0.002100
+13:06:19 [INFO] ~ performing IPFS and contract update
+13:06:19 [INFO] updating IPFS and contract data
+13:06:22 [INFO] Database server operation complete -> get()
+13:06:22 [INFO] Database server operation complete -> get()
+13:06:22 [INFO] Database server operation complete -> get()
+13:06:22 [INFO] Database server operation complete -> get()
+13:06:22 [INFO] Database server operation complete -> get()
+13:06:22 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 156 "-" "axios/1.5.0" 0.002608
+13:06:32 [INFO] ~ performing IPFS and contract update
+13:06:32 [INFO] updating IPFS and contract data
+13:06:45 [INFO] ~ performing IPFS and contract update
+13:06:45 [INFO] updating IPFS and contract data
+13:06:52 [INFO] 1 peer(s) fetched from contract
+13:06:59 [INFO] ~ performing IPFS and contract update
+13:06:59 [INFO] updating IPFS and contract data
+13:07:12 [INFO] ~ performing IPFS and contract update
+13:07:12 [INFO] updating IPFS and contract data
+13:07:25 [INFO] ~ performing IPFS and contract update
+13:07:25 [INFO] updating IPFS and contract data
+13:07:38 [INFO] ~ performing IPFS and contract update
+13:07:38 [INFO] updating IPFS and contract data
+13:07:51 [INFO] ~ performing IPFS and contract update
+13:07:51 [INFO] updating IPFS and contract data
+13:08:04 [INFO] ~ performing IPFS and contract update
+13:08:04 [INFO] updating IPFS and contract data
+13:08:22 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+13:08:22 [INFO] Transport layer configured
+13:08:22 [INFO] Gossipsub network layer configured
+13:08:22 [INFO] Node identity configured
+13:08:22 [INFO] Network driver configured
+13:08:22 [INFO] 1 peer(s) fetched from contract
+13:08:22 [INFO] Database is online
+13:08:22 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+13:08:22 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+13:08:22 [INFO] Database server listening on 0.0.0.0:2027
+13:08:22 [INFO] starting 8 workers
+13:08:22 [INFO] Actix runtime found; starting in Actix runtime
+13:08:22 [INFO] 1 peer(s) fetched from contract
+13:08:34 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+13:08:35 [INFO] 97 bytes written to IPFS with CID: Qmc4u7GJtC5faByAMSm45MwBMAbffu1dFtNcJdfrUWiVVM
+13:08:35 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+13:08:35 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+13:08:35 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+13:08:35 [INFO] ~ performing IPFS and contract update
+13:08:35 [INFO] updating IPFS and contract data
+13:08:42 [INFO] SIGINT received; starting forced shutdown
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] accept thread stopped
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] shutting down idle worker
+13:08:42 [INFO] shutting down idle worker
+13:08:45 [INFO] ~ performing IPFS and contract update
+13:08:45 [INFO] updating IPFS and contract data
+13:09:13 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+13:09:13 [INFO] Transport layer configured
+13:09:13 [INFO] Gossipsub network layer configured
+13:09:13 [INFO] Node identity configured
+13:09:13 [INFO] Network driver configured
+13:09:13 [INFO] 1 peer(s) fetched from contract
+13:09:13 [INFO] Database is online
+13:09:13 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+13:09:13 [INFO] Listening on "/ip4/192.168.127.205/tcp/1509"
+13:09:13 [INFO] Database server listening on 0.0.0.0:2027
+13:09:13 [INFO] starting 8 workers
+13:09:13 [INFO] Actix runtime found; starting in Actix runtime
+13:09:13 [INFO] 1 peer(s) fetched from contract
+13:09:17 [INFO] adding application to database: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn...
+13:09:17 [INFO] 97 bytes written to IPFS with CID: 
+13:09:17 [INFO] Peers subscribed to did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn: 1
+13:09:17 [INFO] subscribing node to application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+13:09:17 [INFO] Subscribe message published for application: did:sam:apps:5F9UDjWo7AvNkvXtARPpN9o37zNf9hjf2gRFxxZhawaSQFRn
+13:09:17 [INFO] ~ performing IPFS and contract update
+13:09:17 [INFO] updating IPFS and contract data
+13:09:27 [INFO] ~ performing IPFS and contract update
+13:09:27 [INFO] updating IPFS and contract data
+13:09:38 [INFO] ~ performing IPFS and contract update
+13:09:38 [INFO] updating IPFS and contract data
+13:09:48 [INFO] ~ performing IPFS and contract update
+13:09:48 [INFO] updating IPFS and contract data
