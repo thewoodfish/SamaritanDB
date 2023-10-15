@@ -1,0 +1,29 @@
+[package]
+name = "samaritan-database"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+syn = "2.0.25"
+dialoguer = "0.10.4"
+async-std = { version = "1.12", features = ["attributes"] }
+libp2p = { version = "0.52.1", features = ["tcp", "ping", "dns", "async-std", "noise", "yamux", "cbor", "identify", "request-response", "websocket", "ping", "macros", "gossipsub", "mdns", "kad" ] }
+log = "0.4.19"
+simplelog = "0.12.1"
+serde = { version = "1.0.171", features = ["derive"] }
+serde_json = "1.0.102"
+libp2p-identity = "0.2.1"
+libp2p-quic = { version="0.6.1" }
+futures = "0.3.28"
+lazy_static = "1.4.0"
+hex = "0.4.3"
+local-ip = "0.1"
+base58 = "0.2.0"
+rand = "0.8.5"
+chacha20poly1305 = "0.10.1"
+ring = "0.16.20"
+sha2 = "0.10.7"
+reqwest = { version = "0.11", features = ["blocking", "json"] }
+tungstenite = "0.20.0"
+sp-core-hashing = "10.0.0"
+actix-web = "4.4.0"
