@@ -118,27 +118,22 @@ pub fn str_to_hex(data: &str) -> String {
 }
 
 // parses contract return data and returns it as a human readable string
-pub fn parse_contract_return_data(binding: &str) -> String {
-    let output = binding.split("elems: ").skip(1).next().unwrap_or_default();
-    let mut collator: Vec<u8> = Vec::new();
-    // lets get all the numbers out
-    let parsed = output
-        .as_bytes()
-        .to_vec()
-        .iter()
-        .filter(|&&e| e == b',' || e.is_ascii_digit())
-        .map(|e| e.clone())
-        .collect::<Vec<u8>>();
-
-    let _ = String::from_utf8(parsed)
-        .unwrap_or_default()
-        .split(',')
-        .map(|e| {
-            collator.push(e.parse::<u8>().unwrap_or_default());
+pub fn parse_contract_return_data(input: &str) -> String {
+    let code_list: Vec<u8> = input
+        .split("[")
+        .nth(1)
+        .and_then(|part| part.split("]").next())
+        .map(|code_str| {
+            code_str
+                .split(",")
+                .filter_map(|num| num.trim().parse().ok())
+                .collect()
         })
-        .collect::<()>();
+        .unwrap_or_else(Vec::new);
 
-    String::from_utf8(collator).unwrap_or_default()
+    let result: String = code_list.iter().map(|&code| code as char).collect();
+
+    result
 }
 
 pub fn parse_multiaddresses(addresses: &str) -> HashMap<String, String> {
@@ -334,8 +329,7 @@ pub fn extract_dids(input: &str) -> Vec<String> {
 }
 
 pub fn disjoint_strings(vec1: &Vec<String>, vec2: &Vec<String>) -> Vec<String> {
-    vec2
-        .iter()
+    vec2.iter()
         .filter(|item| !vec1.contains(item))
         .cloned()
         .collect()

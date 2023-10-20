@@ -2531,47 +2531,14 @@ async fn manage_data_access_changes(
             .to_owned();
 
         let user_dids = user_dids.into_iter().filter(|item| item != "\0").collect();
-        let mut actor_dids = actor_dids.into_iter().filter(|item| item != "\0").collect();
-
-        // Get the DIDs that have just been added to the restricted list
-        let blocker_dids = util::disjoint_strings(&actor_dids, &user_dids);
-        if !blocker_dids.is_empty() {
-            util::log_info(&format!(
-                "{} access-blocking users found for application: `{}`",
-                blocker_dids.len(),
-                did
-            ));
-
-            // Now add to list and enforce the access restrictions
-            actor_dids.extend(blocker_dids.clone().into_iter());
-
-            // save them
-            access_manager
-                .write()
-                .await
-                .restrictions
-                .insert(did.clone(), actor_dids.clone());
-
-            // enforce restrictions
-            for sam_did in blocker_dids.iter() {
-                manage_db_access(
-                    cfg.clone(),
-                    sender_channel.clone(),
-                    state.clone(),
-                    did.clone(),
-                    sam_did.clone(),
-                    false,
-                )
-                .await;
-            }
-        }
+        let actor_dids = actor_dids.into_iter().filter(|item| item != "\0").collect();
 
         // Get the DIDs that have decided to allow the appications access their data
         let liberal_dids = util::disjoint_strings(&user_dids, &actor_dids);
-        if !liberal_dids.is_empty() {
+        if liberal_dids.len() > 0 {
             util::log_info(&format!(
                 "{} access-allowing users found for application: `{}`",
-                blocker_dids.len(),
+                liberal_dids.len(),
                 did
             ));
 
@@ -2590,6 +2557,50 @@ async fn manage_data_access_changes(
                 // remove it from the DID list we have saved
                 access_manager.write().await.restrictions.remove(sam_did);
             }
+        }
+
+        // Get the list of DIDs whose data the app is restricted from accessing
+        let actor_dids = access_manager
+            .read()
+            .await
+            .restrictions
+            .get(&did)
+            .unwrap_or(&Default::default())
+            .to_owned();
+
+        let mut actor_dids = actor_dids.into_iter().filter(|item| item != "\0").collect();
+
+        // Get the DIDs that have just been added to the restricted list
+        let blocker_dids = util::disjoint_strings(&actor_dids, &user_dids);
+        if blocker_dids.len() > 0 {
+            util::log_info(&format!(
+                "{} access-blocking users found for application: `{}`",
+                blocker_dids.len(),
+                did
+            ));
+
+            // enforce restrictions
+            for sam_did in blocker_dids.iter() {
+                manage_db_access(
+                    cfg.clone(),
+                    sender_channel.clone(),
+                    state.clone(),
+                    did.clone(),
+                    sam_did.clone(),
+                    false,
+                )
+                .await;
+            }
+
+            // Now add to list and enforce the access restrictions
+            actor_dids.extend(blocker_dids.clone().into_iter());
+
+            // save them
+            access_manager
+                .write()
+                .await
+                .restrictions
+                .insert(did.clone(), actor_dids.clone());
         }
 
         // wait for some seconds

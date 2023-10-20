@@ -8,7 +8,7 @@ pub async fn get_boot_nodes(cfg: &DBConfig) -> String {
     cli::get_boot_nodes(cfg).await
 }
 
-/// retrieve boot nodes from contract
+/// remove boot nodes from contract
 pub async fn remove_boot_node(cfg: Arc<DBConfig>, addr: &str) {
     cli::remove_boot_node(cfg, addr).await;
 }
@@ -27,7 +27,7 @@ pub async fn get_app_ht_cid(cfg: &DBConfig, did: &str, auth: &str) -> String {
 pub async fn get_subscribers(cfg: Arc<DBConfig>, did: &str) -> String {
     cli::get_subscribers(cfg, did).await
 }
- 
+
 /// add node to application subscribers
 pub async fn subscribe_node(cfg: Arc<DBConfig>, did: &str, addr: &str) {
     cli::subscribe_node(cfg, did, addr).await

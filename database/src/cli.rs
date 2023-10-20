@@ -136,7 +136,7 @@ pub async fn get_boot_nodes(cfg: &DBConfig) -> String {
                 &cfg.get_chain_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
-                "-dry-run",
+                // "--dry-run",
             ])
             .current_dir("./contract")
             .output()
@@ -205,7 +205,7 @@ pub async fn get_application_ht_cid(cfg: &DBConfig, did: &str, auth: &str) -> St
                 &cfg.get_chain_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
-                "-dry-run",
+                // "--dry-run",
             ])
             .current_dir("./contract")
             .output()
@@ -285,7 +285,7 @@ pub async fn get_subscribers(cfg: Arc<DBConfig>, did: &str) -> String {
                 &cfg.get_chain_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
-                "-dry-run",
+                // "--dry-run",
             ])
             .current_dir("./contract")
             .output()
@@ -531,14 +531,14 @@ pub async fn get_application_access_blockers(cfg: Arc<DBConfig>, did: &str) -> S
                 "--contract",
                 &cfg.get_contract_addr(),
                 "--message",
-                "get_blockers",
+                "get_restriction_list",
                 "--args",
                 &util::str_to_hex(did),
                 "--suri",
                 &cfg.get_chain_keys(),
                 "--url",
                 "wss://rococo-contracts-rpc.polkadot.io",
-                // "-dry-run",
+                // "--dry-run",
             ])
             .current_dir("./contract")
             .output()
@@ -555,3 +555,4 @@ pub async fn get_application_access_blockers(cfg: Arc<DBConfig>, did: &str) -> S
         }
     }
 }
+
