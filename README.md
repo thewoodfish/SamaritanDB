@@ -18,7 +18,7 @@ SamaritanDB leverages several key technologies, including:
 - **libp2p**: A modular network stack that provides peer-to-peer communication capabilities.
 - **IPFS (InterPlanetary File System)**: A protocol and network designed to create a content-addressable, peer-to-peer method of storing and sharing hypermedia in a distributed file system.
 - **ink!**: A Rust-based framework for writing and executing smart contracts.
-- **Cargo Contract**: A Rust package manager for smart contracts.
+- **Cargo Contract**: A Rust setup and deployment tool for developing Wasm based smart contracts via ink!
 - Other valuable Rust libraries that enhance the functionality of SamaritanDB.
 
 ## Getting Started
