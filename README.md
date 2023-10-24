@@ -169,11 +169,17 @@ pub async fn update_ht_cid(cfg: Arc<DBConfig>, did: &str, cid: &str) {
 
 ```
 
-## What will we improve on?
-1. Provide a solid internal data representation.
-2. Provide a better internal structure to accomodate our objectives.
-3. Provide a better and efficient overall system architecture and design.
-4. Check all points on the `libp2p` networking stack e.g NAT traversal.
-5. Listen and react actively to contract events.
-6. Make better overall component and implementation descisions.
-7. Have fun!
+## Areas of Improvement
+
+In our continuous journey to enhance our project, we will focus on the following key areas:
+
+1. Strengthen our internal data representation for improved data management.
+2. Enhance our internal structure to align more effectively with our objectives.
+3. Refine our system architecture and design for increased efficiency and robustness.
+4. Thoroughly address all aspects of the `libp2p` networking stack, including NAT traversal, for seamless communication.
+5. Actively monitor and respond to contract events to ensure real-time adaptability.
+6. Reduce contract dependency and assistance.
+7. Make well-informed decisions regarding our components and implementations to achieve optimal outcomes.
+8. Foster an environment of creativity and enjoyment throughout the development process.
+
+These improvements are essential to the ongoing success and evolution of our project.
