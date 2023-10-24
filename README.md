@@ -29,7 +29,8 @@ To get started with SamaritanDB, follow these steps:
 
 1. Clone the repository: `git clone https://github.com/yourusername/samaritandb.git`.
 2. Install the [IPFS daemon](https://docs.ipfs.tech/install/).
-3. Install [cargo contract](https://crates.io/crates/cargo-contract).
+3. Install and setup the rust toolchain.
+4. Install [cargo contract](https://crates.io/crates/cargo-contract).
 
 ### Configuration
 
