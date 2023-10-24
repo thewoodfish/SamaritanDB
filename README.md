@@ -160,7 +160,7 @@ pub async fn update_ht_cid(cfg: Arc<DBConfig>, did: &str, cid: &str) {
             Ok(_) => return,
             Err(_) => {
                 util::log_error(
-                    "contract invocation returned an error: fn -> `new_account()`. Trying again...",
+                    "contract invocation returned an error: fn -> `update_ht_cid()`. Trying again...",
                 );
                 // sleep for 5 seconds
                 async_std::task::sleep(CLI_RETRY_DURATION).await;
