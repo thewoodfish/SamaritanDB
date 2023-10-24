@@ -1866,9 +1866,6 @@ pub async fn display_db_cmds() {
     let help_text = r#"
     Database Commands:
     
-    new <app | sam> <mnemonic>
-        Create a new application or Samaritan.
-    
     init <application_DID> <mnemonic>
         Initialize application to be managed by the database.
     
@@ -1895,9 +1892,6 @@ pub async fn display_db_cmds() {
     
     del <application_DID> [samaritan_DID] <key>
         Delete data.
-    
-    access <application_DID> [samaritan_DID] <allow | deny>
-        Manage data access.
     
     config -url <link>
         Change the pinning server for IPFS updates.

@@ -72,18 +72,24 @@ Below are the commands available for interacting with SamaritanDB on the command
 - **Delete Data:**
 `del <application_DID> [samaritan_DID] <key>`
 
-- **Manage Data Access (Allow or Deny):**
-`access <application_DID> [samaritan_DID] <allow | deny>`
-
 - **Change the Pinning Server for IPFS Updates:**
 `config -url <link>`
 
+## Goals
+
+SamaritanDB aims to achieve the following goals:
+
+- Communicate peer-to-peer without relying on a single coordinator.
+- Store and retrieve data in a decentralized manner.
+- Broadcast operations to peers for real-time data synchronization.
+- Persist data securely using IPFS (InterPlanetary File System).
+- Facilitate seamless integration of new nodes into the management of application data.
+- Responsively handle data access changes within the `ink! contract`.
+
+
 ## How It Works
 
-SamaritanDB works by providing a decentralized and secure data store for users. It employs libp2p and IPFS for peer-to-peer communication and data storage. Smart contracts, built using ink! and managed with Cargo Contract, enable the creation and enforcement of data access rules.
 
-For a detailed explanation of how SamaritanDB functions, please consult the [How It Works](#how-it-works) section in the SamaritanDB documentation.
- 
 ## License
 
 &copy; Copyright 2023 Algorealm, Inc. All rights reserved. SamaritanDB is licensed under the [MIT License](https://github.com/yourusername/samaritandb/blob/main/LICENSE).
