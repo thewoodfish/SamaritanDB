@@ -183,3 +183,21 @@ In our continuous journey to enhance our project, we will focus on the following
 8. Foster an environment of creativity and enjoyment throughout the development process.
 
 These improvements are essential to the ongoing success and evolution of our project.
+
+## Contract
+
+In our project, the `ink! contract` serves as the backbone of our decentralized data management system. It plays a pivotal role in ensuring the fulfillment of our operational objectives, empowering users to maintain control over their data. Please view the (source here)[https://github.com/algorealmInc/SamaritanDB-Contract].
+
+## Tic-Tac-Toe Integration
+
+As a testament to the capabilities of `ink!`, we've seamlessly integrated it with SamaritanDB in the development of a simple yet compelling Tic-Tac-Toe game. This demonstration showcases the robustness of `ink!` and its compatibility with SamaritanDB.
+
+### Explore the Code
+
+For those interested in exploring the inner workings of our Tic-Tac-Toe game, the source code can be found [here](https://github.com/thewoodfish/Tic-Tac-Toe).
+
+### Live Demo
+
+To experience the game in action and gain a better understanding of our project's objectives, we invite you to check out our live demo [here](https://algorealm.org/splash.html). This live demonstration provides a hands-on experience of our innovative technology stack.
+
+
