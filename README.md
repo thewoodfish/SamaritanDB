@@ -186,11 +186,11 @@ These improvements are essential to the ongoing success and evolution of our pro
 
 ## Contract
 
-In our project, the `ink! contract` serves as the backbone of our decentralized data management system. It plays a pivotal role in ensuring the fulfillment of our operational objectives, empowering users to maintain control over their data. Please view the (source here)[https://github.com/algorealmInc/SamaritanDB-Contract].
+In our project, the `ink! contract` serves as the backbone of our decentralized data management system. It plays a pivotal role in ensuring the fulfillment of our operational objectives, empowering users to maintain control over their data. Please view the [source here](https://github.com/algorealmInc/SamaritanDB-Contract).
 
 ## Tic-Tac-Toe Integration
 
-As a testament to the capabilities of `ink!`, we've seamlessly integrated it with SamaritanDB in the development of a simple yet compelling Tic-Tac-Toe game. This demonstration showcases the robustness of `ink!` and its compatibility with SamaritanDB.
+As a testament to the capabilities of `ink!`, we've seamlessly integrated it with SamaritanDB in the development of a simple yet compelling Tic-Tac-Toe game. This demonstration showcases the power of `ink!` and its compatibility with SamaritanDB.
 
 ### Explore the Code
 
