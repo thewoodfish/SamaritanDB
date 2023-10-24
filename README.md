@@ -77,9 +77,7 @@ Below are the commands available for interacting with SamaritanDB on the command
 - **Change the Pinning Server for IPFS Updates:**
   `config -url <link>`
 
-## Goals
-
-This SamaritanDB POC aims to achieve the following goals:
+## What can this POC do?
 
 - Communicate peer-to-peer without relying on a single coordinator.
 - Store and retrieve data in a decentralized manner.
@@ -170,3 +168,12 @@ pub async fn update_ht_cid(cfg: Arc<DBConfig>, did: &str, cid: &str) {
 }
 
 ```
+
+## What will we improve on?
+1. Provide a solid internal data representation.
+2. Provide a better internal structure to accomodate our objectives.
+3. Provide a better and efficient overall system architecture and design.
+4. Check all points on the `libp2p` networking stack e.g NAT traversal.
+5. Listen and react actively contract events.
+6. Make better overall component descisions.
+7. Have fun!
