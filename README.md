@@ -46,34 +46,34 @@ To get started with SamaritanDB, follow these steps:
 Below are the commands available for interacting with SamaritanDB on the command-line:
 
 - **Initialize an Application to be Managed by the Database:**
-`init <application_DID> <your_application_generated_mnemonic>`
+  `init <application_DID> <your_application_generated_mnemonic>`
 
 - **Store Data About an Application or Samaritan:**
-`set <application_DID> [samaritan_DID] <key> <value>`
+  `set <application_DID> [samaritan_DID] <key> <value>`
 
 - **Retrieve Data:**
-`get <application_DID> [samaritan_DID] <key>`
+  `get <application_DID> [samaritan_DID] <key>`
 
 - **Check If Data Exists:**
-`exists <application_DID> [samaritan_DID] <key>`
+  `exists <application_DID> [samaritan_DID] <key>`
 
 - **Provide Information About the Database:**
-`info`
+  `info`
 
 - **Perform Necessary Bookkeeping and Shut Down the Database:**
-`quit`
+  `quit`
 
 - **Delete All Data for an Application or Samaritan:**
-`truncate <application_DID> [samaritan_DID]`
+  `truncate <application_DID> [samaritan_DID]`
 
 - **Remove an Application from the Database:**
-`leave <application_DID>`
+  `leave <application_DID>`
 
 - **Delete Data:**
-`del <application_DID> [samaritan_DID] <key>`
+  `del <application_DID> [samaritan_DID] <key>`
 
 - **Change the Pinning Server for IPFS Updates:**
-`config -url <link>`
+  `config -url <link>`
 
 ## Goals
 
@@ -86,10 +86,86 @@ SamaritanDB aims to achieve the following goals:
 - Facilitate seamless integration of new nodes into the management of application data.
 - Responsively handle data access changes within the `ink! contract`.
 
-
 ## How It Works
 
+### Configuration and Initialization
 
-## License
+After configuring the `conf.json` file and starting the database server, an application is initialized by running the `init` command. This command triggers the database to locate the application's hashtable on the `ink! contract`. It then fetches and stores the latest data image of the application in memory and joins the network of providers. As data is stored in the database, it's propagated to various databases running application operations.
 
-&copy; Copyright 2023 Algorealm, Inc. All rights reserved. SamaritanDB is licensed under the [MIT License](https://github.com/yourusername/samaritandb/blob/main/LICENSE).
+### Starting
+
+When the database is started, it first checks the environment to ensure that necessary infrastructure, such as `ipfs`, is available. The database sets up its network identity, facilitated by `libp2p`. An HTTP server port is also opened, allowing the database to listen for external connections.
+
+### Booting
+
+For the network to function effectively, nodes should not operate in isolation. After starting, the node queries the contract for potential boot nodes. If found, it attempts to connect to them immediately. If there are fewer than 10 nodes in the contract, the node's `multiaddress` is added to the contract storage, allowing others to connect. This is a temporary solution, with reduced reliance on the contract planned in the future.
+
+### Joining
+
+Upon application initialization, the database checks the location of the application's hashtable on the `ink! contract`, retrieves and stores the latest data image in memory, and joins the network of providers.
+
+### Reading and Writing
+
+Data written to an application is gossiped to its peers, following an eventual consistency model, where consistency is based on timestamps.
+
+### Leaving
+
+When a database is shut down, it notifies its directly connected peers and removes its address from the list of boot nodes, in case it happens to be there. This prevents the address from being used when it's unavailable.
+
+### Data Persistence
+
+Each application passes a token within the network, determining which node is responsible for persisting the data state on IPFS by pinning it on its local node. New nodes fetch data from this node and update the contract's IPFS URIs. This process occurs as a background task. If configured, remote HTTP servers can receive IPFS CID via POST requests. Once specific criteria are met, the token is passed. The token is failure-proof and can only be lost when all nodes are down.
+
+### Data Access Change
+
+The database runs background tasks that periodically query the `ink! contract` storage. The contract is indexed by applications the database cares about. When a change is detected, the node adjusts its internal access control accordingly. Future improvements will include listening to contract events for more immediate responses.
+
+### HTTP Requests
+
+The database server accepts HTTP requests on the port configured in the `conf.json` file. These requests can perform multiple singular operations simultaneously. The database authenticates each request before processing.
+
+Understanding the `libp2p` specification is essential to grasp many of the internal network operations of the database.
+
+## `Cargo Contract`
+
+The `cargo contract` tool is employed exclusively for communication with the contract. It is invoked using the Rust `Command` API, which triggers the operating system to execute the utility. Upon receiving results, they are parsed and presented to the database in a user-friendly format.
+
+Here's an example of using `cargo contract` to interact with `ink!`:
+
+```rust
+/// Update the hashtable CID of an application
+pub async fn update_ht_cid(cfg: Arc<DBConfig>, did: &str, cid: &str) {
+    loop {
+        match CliCommand::new("cargo")
+            .args([
+                "contract",
+                "call",
+                "--contract",
+                &cfg.get_contract_addr(),
+                "--message",
+                "update_account_ht_cid",
+                "--args",
+                &util::str_to_hex(did),
+                &util::str_to_hex(cid),
+                "--suri",
+                &cfg.get_chain_keys(),
+                "--url",
+                "wss://rococo-contracts-rpc.polkadot.io",
+            ])
+            .current_dir("./contract")
+            .output()
+        {
+            Ok(_) => return,
+            Err(_) => {
+                util::log_error(
+                    "contract invocation returned an error: fn -> `new_account()`. Trying again...",
+                );
+                // sleep for 5 seconds
+                async_std::task::sleep(CLI_RETRY_DURATION).await;
+            }
+        }
+    }
+}
+
+```
+
