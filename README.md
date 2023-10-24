@@ -174,6 +174,6 @@ pub async fn update_ht_cid(cfg: Arc<DBConfig>, did: &str, cid: &str) {
 2. Provide a better internal structure to accomodate our objectives.
 3. Provide a better and efficient overall system architecture and design.
 4. Check all points on the `libp2p` networking stack e.g NAT traversal.
-5. Listen and react actively contract events.
-6. Make better overall component descisions.
+5. Listen and react actively to contract events.
+6. Make better overall component and implementation descisions.
 7. Have fun!
