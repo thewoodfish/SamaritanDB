@@ -1,6 +1,7 @@
 # SamaritanDB: Your Data, Your Rules
 
 SamaritanDB is a decentralized data store that empowers users to maintain control and sovereignty over the data stored about them by the applications and services they interact with across the internet. To learn more about what SamaritanDB is and why it holds significance, please visit [our wiki](https://algorealm.gitbook.io/samaritandb).
+This Proof of Concept (POC) serves as a critical stepping stone on our path to realizing the overarching vision and future commitments of our project. Its successful execution and validation are paramount to paving the way for the attainment of our core objectives and the promise of a brighter future
 
 ## Table of Contents
 
@@ -77,7 +78,7 @@ Below are the commands available for interacting with SamaritanDB on the command
 
 ## Goals
 
-SamaritanDB aims to achieve the following goals:
+This SamaritanDB POC aims to achieve the following goals:
 
 - Communicate peer-to-peer without relying on a single coordinator.
 - Store and retrieve data in a decentralized manner.
@@ -114,7 +115,7 @@ When a database is shut down, it notifies its directly connected peers and remov
 
 ### Data Persistence
 
-Each application passes a token within the network, determining which node is responsible for persisting the data state on IPFS by pinning it on its local node. New nodes fetch data from this node and update the contract's IPFS URIs. This process occurs as a background task. If configured, remote HTTP servers can receive IPFS CID via POST requests. Once specific criteria are met, the token is passed. The token is failure-proof and can only be lost when all nodes are down.
+Each application passes a token within the network, determining which node is responsible for persisting the data state on IPFS by pinning it on its local node and updating the applications IPFS URIs on the contract. New nodes fetch data from this node upon joining the application network of providers. This process occurs as a background task. If configured, remote HTTP servers can receive IPFS CID via POST requests and pin them locally for even more data availabilty. Once specific criteria are met, the token is passed. The token is failure-proof and can only be lost when all nodes are down.
 
 ### Data Access Change
 
@@ -168,4 +169,3 @@ pub async fn update_ht_cid(cfg: Arc<DBConfig>, did: &str, cid: &str) {
 }
 
 ```
-
