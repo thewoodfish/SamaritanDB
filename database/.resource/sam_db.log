@@ -1487,3 +1487,424 @@
 02:04:18 [INFO] 329 bytes written to IPFS with CID: QmZogSafahdUDnJosdvXTaVgxLQHxpBkrozGyUR8QXe9nD
 02:04:18 [INFO] 138 bytes written to IPFS with CID: QmQSJfXTHknVoqTwEJjEKkx2PsEXXFffPAixU5KKhDYkvr
 02:04:18 [INFO] 287 bytes written to IPFS with CID: QmX1Ep2KuGNUHabK8hhZHhKJ22NrytnwqyjVeRrhK89pKZ
+23:24:37 [INFO] Database Peer ID: 12D3KooWReTry6tEzZqEGXutLPn9DsvGXzYoGDbrv17qFPQhcDby
+23:24:37 [INFO] Transport layer configured
+23:24:37 [INFO] Gossipsub network layer configured
+23:24:37 [INFO] Node identity configured
+23:24:37 [INFO] Network driver configured
+23:24:44 [INFO] 0 peer(s) fetched from contract
+23:24:44 [INFO] Database is online
+23:24:44 [INFO] Listening on "/ip4/127.0.0.1/tcp/1509"
+23:24:44 [INFO] Listening on "/ip4/192.168.59.205/tcp/1509"
+23:24:44 [INFO] Database server listening on 0.0.0.0:2027
+23:24:44 [INFO] starting 8 workers
+23:24:44 [INFO] Actix runtime found; starting in Actix runtime
+23:24:45 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 53 "-" "axios/1.5.0" 0.000391
+23:24:53 [INFO] 0 peer(s) fetched from contract
+23:24:58 [INFO] adding application to database: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq...
+23:25:14 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 53 "-" "axios/1.5.0" 0.000918
+23:25:21 [INFO] 97 bytes written to IPFS with CID: QmP3cCpQDBHTdf2dgbHeY2JCZdQv5u97u5cYCijUUhuyyR
+23:25:32 [INFO] Peers subscribed to did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq: 0
+23:25:32 [INFO] subscribing node to application: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:25:32 [INFO] Subscribe message published for application: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:25:39 [INFO] monitoring network's IPFS and contract data update
+23:25:53 [INFO] monitoring network's IPFS and contract data update
+23:26:07 [INFO] monitoring network's IPFS and contract data update
+23:26:22 [INFO] monitoring network's IPFS and contract data update
+23:26:42 [INFO] monitoring network's IPFS and contract data update
+23:26:58 [INFO] monitoring network's IPFS and contract data update
+23:27:12 [INFO] monitoring network's IPFS and contract data update
+23:27:15 [INFO] Database server operation complete -> get()
+23:27:15 [INFO] Database server operation complete -> get()
+23:27:15 [INFO] Database server operation complete -> get()
+23:27:15 [INFO] Database server operation complete -> get()
+23:27:15 [INFO] Database server operation complete -> get()
+23:27:15 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.000766
+23:27:28 [INFO] monitoring network's IPFS and contract data update
+23:27:34 [INFO] Database server operation complete -> get()
+23:27:34 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.001744
+23:27:34 [INFO] Database server operation complete -> insert()
+23:27:34 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001728
+23:27:34 [INFO] Database server operation complete -> get()
+23:27:34 [INFO] Database server operation complete -> get()
+23:27:34 [INFO] Database server operation complete -> get()
+23:27:34 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.001194
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [INFO] Database server operation complete -> insert()
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [INFO] Database server operation complete -> insert()
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [INFO] Database server operation complete -> insert()
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [INFO] Database server operation complete -> insert()
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [INFO] Database server operation complete -> insert()
+23:27:34 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.029762
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:44 [INFO] monitoring network's IPFS and contract data update
+23:27:48 [INFO] Database server operation complete -> get()
+23:27:48 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 75 "-" "axios/1.5.0" 0.001088
+23:27:48 [INFO] Database server operation complete -> insert()
+23:27:48 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001823
+23:27:48 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:48 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:58 [INFO] Database server operation complete -> get()
+23:27:58 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 74 "-" "axios/1.5.0" 0.001091
+23:27:58 [INFO] Database server operation complete -> insert()
+23:27:58 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001512
+23:27:58 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:58 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:27:58 [INFO] monitoring network's IPFS and contract data update
+23:28:08 [INFO] Database server operation complete -> get()
+23:28:08 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 74 "-" "axios/1.5.0" 0.000337
+23:28:08 [INFO] Database server operation complete -> insert()
+23:28:08 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.000355
+23:28:08 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:28:08 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:28:12 [INFO] monitoring network's IPFS and contract data update
+23:28:20 [INFO] Database server operation complete -> get()
+23:28:20 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 75 "-" "axios/1.5.0" 0.001181
+23:28:20 [INFO] Database server operation complete -> insert()
+23:28:20 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001536
+23:28:20 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:28:20 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:28:26 [INFO] monitoring network's IPFS and contract data update
+23:28:28 [INFO] Database server operation complete -> get()
+23:28:28 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 74 "-" "axios/1.5.0" 0.000907
+23:28:28 [INFO] Database server operation complete -> insert()
+23:28:28 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 30 "-" "axios/1.5.0" 0.001844
+23:28:28 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:28:28 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:28:32 [INFO] ~ acquired responsibility for network's data update
+23:28:37 [INFO] Database server operation complete -> get()
+23:28:37 [INFO] Database server operation complete -> get()
+23:28:37 [INFO] Database server operation complete -> get()
+23:28:37 [INFO] Database server operation complete -> get()
+23:28:37 [INFO] Database server operation complete -> get()
+23:28:37 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 163 "-" "axios/1.5.0" 0.001834
+23:28:40 [INFO] performing IPFS and contract update
+23:28:40 [INFO] updating IPFS and contract data
+23:28:40 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:28:40 [INFO] Successfully pinned CID (QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM) on local node
+23:28:40 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:28:40 [INFO] Successfully pinned CID (QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP) on local node
+23:28:40 [INFO] 287 bytes written to IPFS with CID: QmPicpGPSvDbpMymvWHWhhkMtsn1HsXHQHpEoXZwHje8G3
+23:29:05 [INFO] network data update successful - cid: QmPicpGPSvDbpMymvWHWhhkMtsn1HsXHQHpEoXZwHje8G3, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:29:05 [INFO] Successfully pinned CID (QmPicpGPSvDbpMymvWHWhhkMtsn1HsXHQHpEoXZwHje8G3) on local node
+23:29:11 [INFO] 1 access-blocking users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:29:15 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:29:15 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:29:20 [INFO] performing IPFS and contract update
+23:29:20 [INFO] updating IPFS and contract data
+23:29:20 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:29:20 [INFO] Successfully pinned CID (QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM) on local node
+23:29:20 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:29:20 [INFO] 288 bytes written to IPFS with CID: QmcxR5U2F4nKFMWCd53j5ibmMys1KTgr8HhwZUFt9smag3
+23:29:29 [INFO] network data update successful - cid: QmcxR5U2F4nKFMWCd53j5ibmMys1KTgr8HhwZUFt9smag3, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:29:29 [INFO] Successfully pinned CID (QmcxR5U2F4nKFMWCd53j5ibmMys1KTgr8HhwZUFt9smag3) on local node
+23:29:47 [INFO] performing IPFS and contract update
+23:29:47 [INFO] updating IPFS and contract data
+23:29:59 [INFO] 0 peer(s) fetched from contract
+23:30:05 [INFO] performing IPFS and contract update
+23:30:05 [INFO] updating IPFS and contract data
+23:30:21 [INFO] performing IPFS and contract update
+23:30:21 [INFO] updating IPFS and contract data
+23:30:38 [INFO] performing IPFS and contract update
+23:30:38 [INFO] updating IPFS and contract data
+23:30:53 [INFO] performing IPFS and contract update
+23:30:53 [INFO] updating IPFS and contract data
+23:31:08 [INFO] performing IPFS and contract update
+23:31:08 [INFO] updating IPFS and contract data
+23:31:23 [INFO] performing IPFS and contract update
+23:31:23 [INFO] updating IPFS and contract data
+23:31:43 [INFO] performing IPFS and contract update
+23:31:43 [INFO] updating IPFS and contract data
+23:31:57 [INFO] performing IPFS and contract update
+23:31:57 [INFO] updating IPFS and contract data
+23:31:58 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:31:58 [INFO] Database server operation complete -> get()
+23:31:58 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:31:58 [INFO] Database server operation complete -> get()
+23:31:58 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:31:58 [INFO] Database server operation complete -> get()
+23:31:58 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:31:58 [INFO] Database server operation complete -> get()
+23:31:58 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:31:58 [INFO] Database server operation complete -> get()
+23:31:58 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.004395
+23:32:11 [INFO] performing IPFS and contract update
+23:32:11 [INFO] updating IPFS and contract data
+23:32:25 [INFO] performing IPFS and contract update
+23:32:25 [INFO] updating IPFS and contract data
+23:32:38 [INFO] performing IPFS and contract update
+23:32:38 [INFO] updating IPFS and contract data
+23:32:52 [INFO] performing IPFS and contract update
+23:32:52 [INFO] updating IPFS and contract data
+23:33:05 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:33:05 [INFO] Database server operation complete -> get()
+23:33:05 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:33:05 [INFO] Database server operation complete -> get()
+23:33:05 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:33:05 [INFO] Database server operation complete -> get()
+23:33:05 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:33:05 [INFO] Database server operation complete -> get()
+23:33:05 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:33:05 [INFO] Database server operation complete -> get()
+23:33:05 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.006178
+23:33:06 [INFO] performing IPFS and contract update
+23:33:06 [INFO] updating IPFS and contract data
+23:33:20 [INFO] performing IPFS and contract update
+23:33:20 [INFO] updating IPFS and contract data
+23:33:34 [INFO] performing IPFS and contract update
+23:33:34 [INFO] updating IPFS and contract data
+23:33:49 [INFO] performing IPFS and contract update
+23:33:49 [INFO] updating IPFS and contract data
+23:34:07 [INFO] performing IPFS and contract update
+23:34:07 [INFO] updating IPFS and contract data
+23:34:21 [INFO] performing IPFS and contract update
+23:34:21 [INFO] updating IPFS and contract data
+23:34:35 [INFO] performing IPFS and contract update
+23:34:35 [INFO] updating IPFS and contract data
+23:34:48 [INFO] performing IPFS and contract update
+23:34:48 [INFO] updating IPFS and contract data
+23:34:57 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:34:57 [INFO] Database server operation complete -> get()
+23:34:57 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:34:57 [INFO] Database server operation complete -> get()
+23:34:57 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:34:57 [INFO] Database server operation complete -> get()
+23:34:57 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:34:57 [INFO] Database server operation complete -> get()
+23:34:57 [ERROR] Permission to access data unit denied: did:sam:root:5HR5ib6FhSpbDa9B2hvAMSyCmyrfmaCPMr1eYHjRF2Eap74a
+23:34:57 [INFO] Database server operation complete -> get()
+23:34:57 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 500 61 "-" "axios/1.5.0" 0.000946
+23:35:03 [INFO] performing IPFS and contract update
+23:35:03 [INFO] updating IPFS and contract data
+23:35:04 [INFO] 0 peer(s) fetched from contract
+23:35:17 [INFO] performing IPFS and contract update
+23:35:17 [INFO] updating IPFS and contract data
+23:35:31 [INFO] performing IPFS and contract update
+23:35:31 [INFO] updating IPFS and contract data
+23:35:45 [INFO] performing IPFS and contract update
+23:35:45 [INFO] updating IPFS and contract data
+23:35:59 [INFO] performing IPFS and contract update
+23:35:59 [INFO] updating IPFS and contract data
+23:36:12 [INFO] performing IPFS and contract update
+23:36:12 [INFO] updating IPFS and contract data
+23:36:26 [INFO] performing IPFS and contract update
+23:36:26 [INFO] updating IPFS and contract data
+23:36:41 [INFO] performing IPFS and contract update
+23:36:41 [INFO] updating IPFS and contract data
+23:36:54 [INFO] performing IPFS and contract update
+23:36:54 [INFO] updating IPFS and contract data
+23:37:08 [INFO] performing IPFS and contract update
+23:37:08 [INFO] updating IPFS and contract data
+23:37:22 [INFO] performing IPFS and contract update
+23:37:22 [INFO] updating IPFS and contract data
+23:37:36 [INFO] performing IPFS and contract update
+23:37:36 [INFO] updating IPFS and contract data
+23:37:50 [INFO] performing IPFS and contract update
+23:37:50 [INFO] updating IPFS and contract data
+23:38:04 [INFO] performing IPFS and contract update
+23:38:04 [INFO] updating IPFS and contract data
+23:38:17 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:38:18 [INFO] performing IPFS and contract update
+23:38:18 [INFO] updating IPFS and contract data
+23:38:18 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:38:18 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:38:19 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:38:33 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:38:33 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:38:35 [INFO] network data update successful - cid: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:38:35 [INFO] Successfully pinned CID (QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv) on local node
+23:38:38 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:38:54 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:38:54 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:38:55 [INFO] performing IPFS and contract update
+23:38:55 [INFO] updating IPFS and contract data
+23:38:55 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:38:55 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:38:55 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:38:56 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:13 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:13 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:15 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:18 [INFO] performing IPFS and contract update
+23:39:18 [INFO] updating IPFS and contract data
+23:39:18 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:39:18 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:39:18 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:39:26 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:26 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:30 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:35 [INFO] performing IPFS and contract update
+23:39:35 [INFO] updating IPFS and contract data
+23:39:35 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:39:35 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:39:35 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:39:38 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:38 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:41 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:47 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:47 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:49 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:53 [INFO] performing IPFS and contract update
+23:39:53 [INFO] updating IPFS and contract data
+23:39:53 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:39:53 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:39:53 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:39:54 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:54 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:58 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:39:59 [INFO] Database server operation complete -> get()
+23:39:59 [INFO] Database server operation complete -> get()
+23:39:59 [INFO] Database server operation complete -> get()
+23:39:59 [INFO] Database server operation complete -> get()
+23:39:59 [INFO] Database server operation complete -> get()
+23:39:59 [INFO] 127.0.0.1 "POST /db/data HTTP/1.1" 200 163 "-" "axios/1.5.0" 0.009032
+23:40:02 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:02 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:05 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:09 [INFO] performing IPFS and contract update
+23:40:09 [INFO] updating IPFS and contract data
+23:40:09 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:40:10 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:40:10 [INFO] 287 bytes written to IPFS with CID: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X
+23:40:11 [INFO] 0 peer(s) fetched from contract
+23:40:14 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:14 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:20 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:21 [INFO] network data update successful - cid: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:40:21 [INFO] Successfully pinned CID (QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X) on local node
+23:40:28 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:28 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:29 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:33 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:33 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:35 [INFO] performing IPFS and contract update
+23:40:35 [INFO] updating IPFS and contract data
+23:40:35 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:40:35 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:40:35 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:40:37 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:39 [INFO] network data update successful - cid: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:40:39 [INFO] Successfully pinned CID (QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv) on local node
+23:40:43 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:43 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:46 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:50 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:50 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:53 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:53 [INFO] performing IPFS and contract update
+23:40:53 [INFO] updating IPFS and contract data
+23:40:54 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:40:54 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:40:54 [INFO] 287 bytes written to IPFS with CID: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X
+23:40:57 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:57 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:40:57 [INFO] network data update successful - cid: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:40:57 [INFO] Successfully pinned CID (QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X) on local node
+23:41:00 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:04 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:04 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:07 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:10 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:10 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:11 [INFO] performing IPFS and contract update
+23:41:11 [INFO] updating IPFS and contract data
+23:41:11 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:41:11 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:41:11 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:41:13 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:15 [INFO] network data update successful - cid: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:41:15 [INFO] Successfully pinned CID (QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv) on local node
+23:41:19 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:19 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:22 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:25 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:25 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:29 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:30 [INFO] performing IPFS and contract update
+23:41:30 [INFO] updating IPFS and contract data
+23:41:30 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:41:30 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:41:30 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:41:33 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:33 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:37 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:42 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:42 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:46 [INFO] performing IPFS and contract update
+23:41:46 [INFO] updating IPFS and contract data
+23:41:46 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:41:46 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:41:46 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:41:47 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:52 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:52 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:55 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:59 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:41:59 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:03 [INFO] performing IPFS and contract update
+23:42:03 [INFO] updating IPFS and contract data
+23:42:03 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:42:03 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:42:03 [INFO] 287 bytes written to IPFS with CID: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X
+23:42:04 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:07 [INFO] network data update successful - cid: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:42:08 [INFO] Successfully pinned CID (QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X) on local node
+23:42:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:14 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:19 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:19 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:23 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:24 [INFO] performing IPFS and contract update
+23:42:24 [INFO] updating IPFS and contract data
+23:42:24 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:42:24 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:42:24 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:42:26 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:26 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:28 [INFO] network data update successful - cid: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
+23:42:28 [INFO] Successfully pinned CID (QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv) on local node
+23:42:30 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:34 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:37 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:42 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:42 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:42 [INFO] performing IPFS and contract update
+23:42:42 [INFO] updating IPFS and contract data
+23:42:42 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:42:42 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:42:42 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:42:47 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:51 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:51 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:55 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:42:57 [INFO] performing IPFS and contract update
+23:42:57 [INFO] updating IPFS and contract data
+23:42:57 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:42:57 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:42:57 [INFO] 287 bytes written to IPFS with CID: QmPh9B1zS3nR1HPNX4F9LH5r27dPx2tbTc24SfD3CFLujv
+23:43:01 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:01 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:02 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:06 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:06 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:09 [INFO] 1 access-allowing users found for application: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:11 [INFO] performing IPFS and contract update
+23:43:11 [INFO] updating IPFS and contract data
+23:43:11 [INFO] 138 bytes written to IPFS with CID: QmTkgj8inspsptcojoKPJ9Yu29DgLCuCAw2RZqPdCDEZWM
+23:43:11 [INFO] 329 bytes written to IPFS with CID: QmeppPeyb4eypPCfyTg2B5w6NasTRip42fbfEddAwu5xfP
+23:43:11 [INFO] 287 bytes written to IPFS with CID: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X
+23:43:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:12 [ERROR] Failed to publish message to peers: `did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq`
+23:43:15 [INFO] network data update successful - cid: QmXfqnbay1SF5PoZffNJzjW2N59VvjbMHQvoxZcRU6gk9X, did: did:sam:apps:5GWH4sLKB3NB3iKB8e4zcQmouoCbjwF9372Kgo7qgSYbwAGq
