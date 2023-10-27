@@ -1,7 +1,8 @@
-{
-    "protobuf_keypair": [],
-    "tcp_port": 1509,
-    "chain_keys": "dilemma quarter decrease simple climb boring liberty tobacco upper axis neutral suit",
-    "contract_address": "5GpVUDUCJtMcXtwocMuD89JXZ94BNdxhdn3MaqBRXmo5BZFH",
-    "server_address_port": 2027
-}
+
+        {
+            "protobuf_keypair": [8,1,18,64,4,6,168,164,84,243,246,30,251,170,237,166,76,239,85,63,96,207,13,230,24,186,45,148,16,36,6,74,232,181,26,196,101,194,118,113,133,5,144,101,96,114,239,73,204,94,74,169,59,128,188,17,110,183,40,91,25,152,219,30,26,130,145,160],
+            "tcp_port": 1509,
+            "chain_keys": "dilemma quarter decrease simple climb boring liberty tobacco upper axis neutral suit",
+            "contract_address": "5GpVUDUCJtMcXtwocMuD89JXZ94BNdxhdn3MaqBRXmo5BZFH",
+            "server_address_port": 2027
+        }
