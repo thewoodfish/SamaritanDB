@@ -551,7 +551,6 @@ impl Database {
                         let mut meta = Metadata::new();
                         // fetch data and metadata from IPFS
                         ipfs::fetch_data(&mut data, &mut meta, cid);
-
                         if data.len() != 0 {
                             // write to storage now
                             let mut guard = self.file_lookup_table.lock().unwrap();
@@ -788,7 +787,7 @@ impl Config {
             ipfs_sync_interval: 5,                  // sync every 30 seconds
             metadata: String::new(),                // will populate this later
             separator: "*%~(@^&*$)~%*".to_string(), // complex separator
-            contract_address: "5FRBJwwhFbe6gkRTNuEiECDGodUXuPioafZmBgrWHrGfUPTN".to_string(), // contract address
+            contract_address: "5GGiFzRfs9zzKx1rV5b3uFgXQ7ZozR6WXscgniYBKZ3ciHiE".to_string(), // contract address
             // contract_keys: "blast they annual column pave umbrella again olympic exotic vibrant lemon visa".to_string(),     // contract key
             contract_keys: "//Alice".to_string(), // for test
             init_elements_count: 15,

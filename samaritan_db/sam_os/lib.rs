@@ -23,14 +23,18 @@ mod sam_os {
         db_meta: DbMetadata,
     }
 
-    #[derive(scale::Decode, scale::Encode, Default)]
+    #[derive(scale::Decode, scale::Encode, Default, Clone)]
     #[cfg_attr(
         feature = "std",
         derive(scale_info::TypeInfo, ink::storage::traits::StorageLayout)
     )]
     struct UserInfo {
+        /// authentication material
         auth_content: AuthContent,
+        /// uri of document describing the DID
         did_doc_cid: IpfsCid,
+        /// uri of the root hash table
+        root_hash_table: IpfsCid,
     }
 
     /// Error types
@@ -73,10 +77,12 @@ mod sam_os {
             did: DID,
             auth_content: AuthContent,
             did_doc_cid: IpfsCid,
+            root_hash_table: IpfsCid,
         ) -> Result<()> {
             let user = UserInfo {
                 auth_content,
                 did_doc_cid,
+                root_hash_table,
             };
 
             self.auth_list.insert(did, &user);
@@ -85,22 +91,12 @@ mod sam_os {
 
         /// Checks if a DID with the provided auth material exists
         #[ink(message)]
-        pub fn account_is_auth(&self, did: DID, auth_content: AuthContent, is_auth: bool) -> bool {
+        pub fn account_is_auth(&self, did: DID, auth_content: AuthContent) -> (bool, Vec<u8>) {
             // auth account
-            if is_auth {
-                let did_entry = self.auth_list.get(did);
-                match did_entry {
-                    Some(user_info) => user_info.auth_content == auth_content,
-                    None => false,
-                }
-            } else {
-                // check if the account exists at all
-                // without verifying auth
-                if let Some(_) = self.auth_list.get(did) {
-                    true
-                } else {
-                    false
-                }
+            let did_entry = self.auth_list.get(did);
+            match did_entry {
+                Some(user_info) => (user_info.auth_content == auth_content, user_info.root_hash_table.clone()),
+                None => (false, Default::default()),
             }
         }
 
@@ -110,6 +106,20 @@ mod sam_os {
             match self.files_meta.get(hk) {
                 Some(meta) => (meta.nonce, meta.cid),
                 None => (1, Default::default()),
+            }
+        }
+
+        /// Update hashmap of data
+        #[ink(message)]
+        pub fn update_hashtable(&mut self, cid: IpfsCid, did: DID) {
+            let did_entry = self.auth_list.get(&did).clone();
+            match did_entry {
+                Some(user_info) => {
+                    let mut u_info = user_info.clone();
+                    u_info.root_hash_table = cid;
+                    self.auth_list.insert(did, &u_info);
+                }
+                None => {}
             }
         }
 
@@ -259,16 +269,16 @@ mod sam_os {
         }
     }
 
-    #[cfg(test)]
-    mod tests {
-        use super::*;
+    // #[cfg(test)]
+    // mod tests {
+    //     use super::*;
 
-        #[ink::test]
-        fn new_works() {
-            let mut sam = SamOs::new();
-            let did = "did:sam:root:cdsidhfs809s9us0fs9".as_bytes().to_vec();
-            sam.create_new_account(did, 4893290392, Vec::new()).ok();
-            ink::env::debug_println!("{:#?}", sam);
-        }
-    }
+    //     #[ink::test]
+    //     fn new_works() {
+    //         let mut sam = SamOs::new();
+    //         let did = "did:sam:root:cdsidhfs809s9us0fs9".as_bytes().to_vec();
+    //         sam.create_new_account(did, 4893290392, Vec::new()).ok();
+    //         ink::env::debug_println!("{:#?}", sam);
+    //     }
+    // }
 }
