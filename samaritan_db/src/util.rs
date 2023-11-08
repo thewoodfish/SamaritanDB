@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Algorealm
+// This file is a part of SamaritanDb
+
 use crate::sam_prelude::*;
 use std::{
     hash::Hasher,
@@ -62,8 +65,7 @@ fn json_parse<T: Sized + Serialize>(value: T) -> Value {
     json!(value)
 }
 
-#[allow(dead_code)]
-fn json_stringify<T: Sized + Serialize>(value: &T) -> String {
+pub fn json_stringify<T: Sized + Serialize>(value: &T) -> String {
     serde_json::to_string(value).unwrap_or_default()
 }
 
@@ -98,56 +100,6 @@ pub fn get_timestamp() -> u64 {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_secs()
-}
-
-// parse initialation data
-pub fn parse_init_data(data: &(String, String), collator: &mut Vec<TmpData>) {
-    let (basic_info, extra_info) = data;
-    let mut index = 1; // skip first guy
-    let _ = basic_info
-        .split("####")
-        .map(|chunk| {
-            if !chunk.is_empty() {
-                let num_str = extra_info
-                    .split(",,")
-                    .skip(index)
-                    .next()
-                    .unwrap_or_default();
-
-                if !num_str.is_empty() {
-                    let mut num = num_str.split(",");
-                    let mut s = chunk.split("##");
-                    let dids = s.next().unwrap_or("--");
-                    let nonce = num.next().unwrap_or("0");
-                    let access_bit = num.next().unwrap_or("0");
-                    let cid = s.next().unwrap_or_default().to_string();
-                    let hk = num.next().unwrap_or_default();
-
-                    let dids = dids
-                        .split("--")
-                        .map(|d| d.to_owned())
-                        .filter(|did| did != "did:sam:root:apps:xxxxxxxxxxxx")
-                        .collect();
-
-                    // populate
-                    let tmp = TmpData {
-                        dids,
-                        cid,
-                        nonce: nonce.parse::<u64>().unwrap_or(0),
-                        access_bit: access_bit.parse::<u64>().unwrap_or(0),
-                        hash_key: hk.parse::<HashKey>().unwrap_or(0),
-                        cache: Default::default(),
-                    };
-                    collator.push(tmp);
-                }
-            }
-            index += 1;
-        })
-        .collect::<()>();
-
-    //     did:sam:root:jhjbsfgiusif78uwn9s980h9--did:sam:root:apps:xxxxxxxxxxxx##QmsiunSlonNdhuIjNHuUtfkhjOijoho####did:sam:root:jhjbsfgiusif78uwn9s980h9
-    // --did:sam:root:apps:xxxxxxxxxxxx##QmsiunSlonNdhuIjNHuUtfkhjOijoho####
-    // ,,1,0,1,,1,0,1
 }
 
 // parses contract return data and returns it as a human readable string
@@ -201,6 +153,7 @@ pub fn parse_first_tuple_u64(binding: &str) -> u64 {
     str.parse::<u64>().unwrap_or_default()
 }
 
+#[allow(dead_code)]
 /// Parses the tuple vector gotten from the contract
 pub fn parse_contract_tuple_vector(binding: &str) -> String {
     let parsed = binding
@@ -212,4 +165,24 @@ pub fn parse_contract_tuple_vector(binding: &str) -> String {
         .collect::<Vec<u8>>();
 
     String::from_utf8(parsed).unwrap_or_default()
+}
+
+/// Acknowledgements
+pub fn acknowledgement() {
+    println!("🗃 SamaritanDB: A decentralized identity database");
+    println!("🏢 Copyright (c) Algorealm 2023");
+    println!("🕸 Please log your observations, suggestions and complaints at https://github.com/thewoodfish/samDB");
+    println!("🤍 Thank you!");
+}
+
+#[allow(dead_code)]
+pub fn parse_contract_last_u64(binding: &str) -> u64 {
+    let chunks = binding.split("UInt(").collect::<Vec<&str>>();
+    let last_chunk: String = chunks[chunks.len() - 1]
+        .to_owned()
+        .as_str()
+        .chars()
+        .filter(|x| x.is_ascii_digit())
+        .collect();
+    last_chunk.parse::<u64>().unwrap_or_default()
 }

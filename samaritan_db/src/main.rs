@@ -114,6 +114,49 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Response {
+    // make sure that the application is a real one EXCEPT during new
+    // let request: Request<'_>;
+    // if !line.starts_with("new::") || !line.starts_with("NEW::") {
+    //     // check for auth data
+    //     let mut chunks = line.split("~~");
+    //     // the first chunk contains the auth data
+    //     let mut first_chunk = chunks.next().unwrap_or_default().split("::");
+    //     let did = first_chunk.next().unwrap_or_default();
+    //     let keys = first_chunk.next().unwrap_or_default();
+
+    //     if did.len() > 8 && keys.len() > 10 {
+    //         if !db.account_is_alive(did, keys) {
+    //             // check the smart contract for account entry
+    //             let (exists, _) = interface::account_is_auth(&config, &did, keys);
+    //             if !exists {
+    //                 return Response::Error {
+    //                     msg: format!(
+    //                         "account with DID:'{}' and keys:'{}' not recognized",
+    //                         did, keys
+    //                     ),
+    //                 };
+    //             }
+    //         }
+    //     } else {
+    //         return Response::Error {
+    //             msg: format!(
+    //                 "account with DID:'{}' and keys:'{}' not recognized",
+    //                 did, keys
+    //             ),
+    //         };
+    //     }
+
+    //     request = match Request::parse(chunks.next().unwrap_or_default()) {
+    //         Ok(req) => req,
+    //         Err(e) => return Response::Error { msg: e },
+    //     };
+    // } else {
+    //     request = match Request::parse(line) {
+    //         Ok(req) => req,
+    //         Err(e) => return Response::Error { msg: e },
+    //     };
+    // }
+
     let request = match Request::parse(line) {
         Ok(req) => req,
         Err(e) => return Response::Error { msg: e },
@@ -122,39 +165,75 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
     match request {
         Request::New { class, password } => {
             let did = get_did(class);
-            // create the new user on chain
-            if interface::create_new_account(&config, &did, password) {
-                // add to database auth_list for high speed auth
-                db.add_auth_account(&did, password);
-                Response::Double {
-                    one: did.to_owned(),
-                    two: password.to_owned(),
+            // set up hash table for DID
+            let (success, cid) = ipfs::set_up_ht();
+            if success {
+                // create the new user on chain
+                if interface::create_new_account(&config, &did, password, &cid) {
+                    Response::Double {
+                        one: did.to_owned(),
+                        two: password.to_owned(),
+                    }
+                } else {
+                    Response::Error {
+                        msg: "could not complete account creation".into(),
+                    }
                 }
             } else {
                 Response::Error {
-                    msg: "could not complete creation of account".into(),
+                    msg: "could not complete account creation".into(),
                 }
             }
         }
-        Request::Init { did, password } => {
+        Request::Auth { did, password } => {
             // check the database cache for an entry
-            if !db.account_is_alive(&did, password) {
+            if !db.account_is_alive(did, password) {
                 // check the smart contract for account entry
-                if !interface::account_is_auth(&config, &did, password) {
-                    return Response::Error {
-                        msg: format!(
-                            "account with did:'{}' and password:'{}' not recognized",
-                            did, password
-                        ),
-                    };
+                let (exists, root_hash_cid) = interface::account_is_auth(&config, &did, password);
+
+                if !exists {
+                    // if we just want to check if account exists on chain
+                    if password == "null" {
+                        if root_hash_cid.len() < 5 {
+                            return Response::Error {
+                                msg: format!(
+                                    "account with DID:'{}' and password:'{}' not recognized",
+                                    did, password
+                                ),
+                            };
+                        }
+                    } else {
+                        return Response::Error {
+                            msg: format!(
+                                "account with DID:'{}' and password:'{}' not recognized",
+                                did, password
+                            ),
+                        };
+                    }
                 } else {
                     // add to database auth_list for high speed auth
                     db.add_auth_account(&did, password);
 
-                    // start to populate the database with IPFS data
-                    db.populate_db(config, &did);
+                    // for all the apps that have been initialized
+                    // fetch the data the apps hold for the samaritan
+                    db.fetch_sam_data(config, &did);
                 }
             }
+
+            Response::Single(did.to_owned())
+        }
+        Request::Init { did, password } => {
+            let (_, app_ht_cid) = interface::account_is_auth(&config, &did, password);
+
+            // add to database auth_list for high speed auth
+            db.add_auth_account(&did, password);
+
+            // fetch and read hash table into memory
+            db.populate_app_ht(did, &app_ht_cid);
+
+            // start to populate the database with IPFS data
+            db.populate_db(config, &did);
+
             Response::Single(did.to_owned())
         }
         Request::Revoke {
@@ -190,33 +269,71 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             key,
             object_did,
         } => {
-            // check for auth
-            if !db.account_is_auth(&config, &subject_did) {
-                return Response::Error {
-                    msg: format!("account with did:'{}' not recognized", subject_did),
-                };
-            }
+            // calculate hashkey
+            let hash_key: HashKey = get_hashkey(subject_did, object_did);
+            let data = db.get(config, hash_key, key, subject_did, object_did, true);
+            let mut revoked = false;
+            // first remove the revoked flags
+            let mut data = data
+                .iter()
+                .filter(|s| {
+                    if *s != "revoked" {
+                        true
+                    } else {
+                        revoked = true;
+                        false
+                    }
+                })
+                .map(|s| s.to_owned())
+                .collect::<Vec<String>>();
 
-            if object_did != "" {
-                if !db.account_is_auth(&config, &object_did) {
-                    return Response::Error {
-                        msg: format!("account with did:'{}' not recognized", object_did),
-                    };
+            // if an app is selecting data about a Samaritan, it first checks the file (app + sam),
+            // If not found, we fist check if the app has the proper permission
+            if data.len() == 0 && !object_did.is_empty() {
+                // check if its not revoked
+                if !revoked {
+                    // search from Samaritan personal data
+                    let hash_key: HashKey = get_hashkey(object_did, object_did);
+                    data = db.get(config, hash_key, key, object_did, object_did, true);
+
+                    // remove 'revoked' again, if any
+                    data = data
+                        .iter()
+                        .filter(|s| {
+                            if *s != "revoked" {
+                                true
+                            } else {
+                                revoked = true;
+                                false
+                            }
+                        })
+                        .map(|s| s.to_owned())
+                        .collect::<Vec<String>>();
                 }
             }
 
-            // calculate hashkey
-            let hash_key: HashKey = get_hashkey(subject_did, object_did);
-            let nkey = gen_hash(key);
+            let mut collator: Vec<String> = Vec::new();
+            // because of the one step recursion of the get() function, we'll split possible concatenations
+            let _ = data
+                .iter()
+                .map(|s| {
+                    if s.contains("%%%") {
+                        let _ = s
+                            .split("%%%")
+                            .filter(|s| !(*s).is_empty())
+                            .map(|e| collator.push(e.to_string()))
+                            .collect::<()>();
+                    } else {
+                        collator.push(s.clone());
+                    }
+                })
+                .collect::<()>();
 
-            match db.get(config, hash_key, nkey, subject_did) {
-                Some(value) => Response::Double {
-                    one: key.to_owned(),
-                    two: value.to_owned(),
-                },
-                None => Response::Error {
-                    msg: format!("no key: '{}'", key),
-                },
+            let data = serde_json::to_value(&collator).unwrap_or_default();
+
+            Response::Double {
+                one: json_stringify(&key.split(';').collect::<Vec<&str>>()),
+                two: json_stringify(&data),
             }
         }
         Request::Del {
@@ -224,33 +341,30 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             key,
             object_did,
         } => {
-            // check for auth
-            if !db.account_is_auth(&config, &subject_did) {
-                return Response::Error {
-                    msg: format!("account with did:'{}' not recognized", subject_did),
-                };
-            }
-
-            if object_did != "" {
-                if !db.account_is_auth(&config, &object_did) {
-                    return Response::Error {
-                        msg: format!("account with did:'{}' not recognized", object_did),
-                    };
-                }
-            }
-
             // calculate hashkey
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
-            let nkey = gen_hash(key);
+            let data = db.del(config, hash_key, key, subject_did, object_did);
+            let mut collator: Vec<String> = Vec::new();
+            // because of the one step recursion of the del() function, we'll split possible concatenations
+            let _ = data
+                .iter()
+                .map(|s| {
+                    if s.contains("%%%") {
+                        let _ = s
+                            .split("%%%")
+                            .map(|e| collator.push(e.to_string()))
+                            .collect::<()>();
+                    } else {
+                        collator.push(s.clone());
+                    }
+                })
+                .collect::<()>();
 
-            match db.del(&config, key, hash_key, nkey, subject_did) {
-                Some(value) => Response::Double {
-                    one: key.to_owned(),
-                    two: value.to_owned(),
-                },
-                None => Response::Error {
-                    msg: format!("no key: '{}'", key),
-                },
+            let data = serde_json::to_value(&collator).unwrap_or_default();
+
+            Response::Double {
+                one: json_stringify(&key.split(';').collect::<Vec<&str>>()),
+                two: json_stringify(&data),
             }
         }
         Request::Insert {
@@ -259,31 +373,34 @@ fn handle_request(line: &str, db: &Arc<Database>, config: &Arc<Config>) -> Respo
             value,
             object_did,
         } => {
-            // check for auth
-            if !db.account_is_auth(&config, &subject_did) {
-                return Response::Error {
-                    msg: format!("account with did:'{}' not recognized", subject_did),
-                };
-            }
-
-            if object_did != "" {
-                if !db.account_is_auth(&config, &object_did) {
-                    return Response::Error {
-                        msg: format!("account with did:'{}' not recognized", object_did),
-                    };
-                }
-            }
-
             let hash_key: HashKey = get_hashkey(subject_did, object_did);
-            let nkey = gen_hash(key);
-            let previous = db.insert(config, key, hash_key, nkey, value.clone());
+            let previous = db.insert(config, key, hash_key, value.clone());
+            // convert to json value
+            let prev = serde_json::to_value(&previous).unwrap_or_default();
 
             // write file metadata
             db.write_metadata(hash_key, subject_did, object_did);
-            Response::Triple {
-                one: key.to_string(),
-                two: value,
-                three: Some(previous),
+            Response::Single(serde_json::to_string(&prev).unwrap_or_default())
+        }
+        Request::GetAll { app_did, sam_did } => {
+            // check for auth
+            if !db.account_is_auth(&config, &app_did) {
+                return Response::Error {
+                    msg: format!("account with did:'{}' not recognized", app_did),
+                };
+            }
+
+            // calculate hashkey
+            let hash_key: HashKey = get_hashkey(app_did, sam_did);
+
+            match db.get_all(config, hash_key, app_did, sam_did) {
+                Some(value) => Response::Double {
+                    one: app_did.to_owned(),
+                    two: value.to_owned(),
+                },
+                None => Response::Error {
+                    msg: format!("data not found: '{}'", sam_did),
+                },
             }
         }
     }

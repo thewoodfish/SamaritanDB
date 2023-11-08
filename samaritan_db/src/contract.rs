@@ -1,3 +1,6 @@
+// Copyright (c) 2023 Algorealm
+// This file is a part of SamaritanDb
+
 /// the main module to call the contract
 pub mod net {
     use super::super::util;
@@ -12,6 +15,7 @@ pub mod net {
         did: &str,
         password: AuthContent,
         _did_doc_cid: &str,
+        ht_cid: &str,
     ) -> bool {
         let output = Command::new("cargo")
             .args([
@@ -25,10 +29,12 @@ pub mod net {
                 &util::str_to_hex(did),
                 &format!("{}", password),
                 &util::str_to_hex("empty"),
+                &util::str_to_hex(ht_cid),
                 "--suri",
                 &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
+                "--skip-confirm"
+                // "--url",
+                // "wss://rococo-contracts-rpc.polkadot.io",
             ])
             .current_dir("./sam_os")
             .output()
@@ -38,12 +44,7 @@ pub mod net {
     }
 
     /// check if an account exists or is authenticated
-    pub fn account_is_auth(
-        cfg: &Arc<Config>,
-        did: &str,
-        password: AuthContent,
-        is_auth: bool,
-    ) -> bool {
+    pub fn account_is_auth(cfg: &Arc<Config>, did: &str, password: AuthContent) -> (bool, String) {
         let output = Command::new("cargo")
             .args([
                 "contract",
@@ -55,11 +56,10 @@ pub mod net {
                 "--args",
                 &util::str_to_hex(did),
                 &format!("{}", password),
-                &format!("{}", is_auth),
                 "--suri",
                 &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
+                // "--url",
+                // "wss://rococo-contracts-rpc.polkadot.io",
                 "--dry-run",
             ])
             .current_dir("./sam_os")
@@ -67,7 +67,10 @@ pub mod net {
             .expect("failed to execute process");
 
         let binding = String::from_utf8_lossy(&output.stdout);
-        util::parse_contract_boolean(&binding)
+        (
+            util::parse_contract_boolean(&binding),
+            util::parse_contract_return_data(&binding),
+        )
     }
 
     /// update file details
@@ -102,8 +105,9 @@ pub mod net {
                 &format!("{}", access_bits[1]),
                 "--suri",
                 &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
+                "--skip-confirm"
+                // "--url",
+                // "wss://rococo-contracts-rpc.polkadot.io",
             ])
             .current_dir("./sam_os")
             .output()
@@ -130,64 +134,14 @@ pub mod net {
                 &format!("{}", revoke),
                 "--suri",
                 &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
+                "--skip-confirm"
+                // "--url",
+                // "wss://rococo-contracts-rpc.polkadot.io",
             ])
             .current_dir("./sam_os")
             .output()
             .expect("failed to execute process");
         output.status.success()
-    }
-
-    pub fn get_random_files(cfg: &Arc<Config>, did: &str) -> (String, String) {
-        let output = Command::new("cargo")
-            .args([
-                "contract",
-                "call",
-                "--contract",
-                &cfg.get_contract_address(),
-                "--message",
-                "get_files_info",
-                "--args",
-                &util::str_to_hex(did),
-                "--suri",
-                &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
-                "--dry-run",
-            ])
-            .current_dir("./sam_os")
-            .output()
-            .expect("failed to execute process");
-
-        let binding = String::from_utf8_lossy(&output.stdout);
-        let basic_info = util::parse_contract_return_data(&binding);
-
-        // get extra data
-        let output = Command::new("cargo")
-            .args([
-                "contract",
-                "call",
-                "--contract",
-                &cfg.get_contract_address(),
-                "--message",
-                "get_files_extra_info",
-                "--args",
-                &util::str_to_hex(did),
-                "--suri",
-                &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
-                "--dry-run",
-            ])
-            .current_dir("./sam_os")
-            .output()
-            .expect("failed to execute process");
-
-        let binding = String::from_utf8_lossy(&output.stdout);
-        let extra_info = util::parse_contract_tuple_vector(&binding);
-
-        (basic_info, extra_info)
     }
 
     /// get specific file info
@@ -204,8 +158,8 @@ pub mod net {
                 &format!("{}", hk),
                 "--suri",
                 &cfg.get_contract_keys(),
-                "--url",
-                "wss://rococo-contracts-rpc.polkadot.io",
+                // "--url",
+                // "wss://rococo-contracts-rpc.polkadot.io",
                 "--dry-run",
             ])
             .current_dir("./sam_os")
@@ -218,6 +172,28 @@ pub mod net {
             util::parse_contract_return_data(&binding),
         )
     }
+
+    /// update hashmap
+    pub fn update_hashtable(cfg: &Arc<Config>, cid: &str, did: &str) {
+        Command::new("cargo")
+            .args([
+                "contract",
+                "call",
+                "--contract",
+                &cfg.get_contract_address(),
+                "--message",
+                "update_hashtable",
+                "--args",
+                &util::str_to_hex(cid),
+                &util::str_to_hex(did),
+                "--suri",
+                &cfg.get_contract_keys(),
+                "--skip-confirm"
+            ])
+            .current_dir("./sam_os")
+            .output()
+            .expect("failed to execute process");
+    }
 }
 
 pub mod interface {
@@ -227,18 +203,18 @@ pub mod interface {
     use super::*;
     use crate::sam_prelude::{Config, HashKey};
 
-    pub fn create_new_account(cfg: &Arc<Config>, did: &str, passw: &str) -> bool {
+    pub fn create_new_account(cfg: &Arc<Config>, did: &str, passw: &str, ht_cid: &str) -> bool {
         let password = util::gen_hash(passw);
-        net::create_new_account(cfg, did, password, "")
+        net::create_new_account(cfg, did, password, "", ht_cid)
     }
 
-    pub fn account_is_auth(cfg: &Arc<Config>, did: &str, passw: &str) -> bool {
+    pub fn account_is_auth(cfg: &Arc<Config>, did: &str, passw: &str) -> (bool, String) {
         let password = util::gen_hash(passw);
-        net::account_is_auth(cfg, did, password, true)
+        net::account_is_auth(cfg, did, password)
     }
 
-    pub fn account_exists(cfg: &Arc<Config>, did: &str) -> bool {
-        net::account_is_auth(cfg, did, 0, false)
+    pub fn account_exists(cfg: &Arc<Config>, did: &str) -> (bool, String) {
+        net::account_is_auth(cfg, did, 0)
     }
 
     pub fn get_file_info(cfg: &Arc<Config>, hk: HashKey) -> (u64, String) {
@@ -256,11 +232,6 @@ pub mod interface {
         net::update_file_meta(cfg, cid, hashkey, "", dids, access_bits);
     }
 
-    /// get initial random files to populate the database quickly
-    pub fn get_init_files(cfg: &Arc<Config>, did: &str) -> (String, String) {
-        net::get_random_files(cfg, did)
-    }
-
     /// revoke an apps access to user data
     pub fn revoke_app_access(
         cfg: &Arc<Config>,
@@ -269,5 +240,10 @@ pub mod interface {
         revoke: bool,
     ) -> bool {
         net::revoke_app_access(cfg, file_key, app_did, revoke)
+    }
+
+    /// update the state of the hashmap
+    pub fn update_hashtable(cfg: &Arc<Config>, cid: &str, did: &str) {
+        net::update_hashtable(cfg, cid, did);
     }
 }
