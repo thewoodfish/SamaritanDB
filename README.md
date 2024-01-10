@@ -1,6 +1,6 @@
 # SamaritanDB: Empowering Data Sovereignty
 
-SamaritanDB is a decentralized data store that empowers users to maintain control and sovereignty over the data stored about them by the applications and services they interact with across the internet. To learn more about what SamaritanDB is and why it holds significance, please visit [our wiki](https://algorealm.gitbook.io/samaritandb).
+SamaritanDB is a decentralized data store that empowers users to maintain control and sovereignty over the data stored about them by the applications and services they interact with across the internet.
 This Proof of Concept (POC) serves as a critical stepping stone on our path to realizing the overarching vision and future commitments of our project. Its successful execution and validation are paramount to paving the way for the attainment of our core objectives and the promise of a brighter future
 
 ## Table of Contents
